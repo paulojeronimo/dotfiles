@@ -1,0 +1,112 @@
+#!/bin/bash
+# Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+
+# Dot files (and other dirs/files) included in this repo, excluding README.* files and .git dir.
+DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -name $DOTFILES_HOME -o -name .git -o -name README.\* \)'
+
+_dotfiles() {
+   local f
+   local t
+   local op=$1
+
+   for f in `eval $DOTFILES`
+   do
+      f=${f##*/}
+      [ -f "$f" ] && t=file || t=dir
+
+      $op $f $t
+   done
+}
+
+_list() {
+   local f=$1
+   local t=$2
+
+   echo "$f ($t)"
+}
+
+_install() {
+   local f=$1
+   local t=$2
+
+   echo "Installing $t $f at ~/ from $DOTFILES_HOME ..."
+
+   rm -rf ~/$f
+   cp -a $DOTFILES_HOME/$f ~/
+}
+
+_diff() {
+   local f=$1
+   local t=$2
+
+   echo "Diff between ~/$f and $DOTFILES_HOME/$f ..."
+   diff -uNr ~/$f $DOTFILES_HOME/$f
+}
+
+_update() {
+   local f=$1
+   local t=$2
+
+   echo -n "Updating $t $DOTFILES_HOME/$f from ~/ ... "
+
+   if [ "$t" = "file" ]
+   then
+      [ ~/$f -nt $DOTFILES_HOME/$f ] && { cp -af ~/$f $DOTFILES_HOME/; echo 'done!'; } || echo 'skipped!'
+   else
+      rsync -av --update --delete ~/$f $DOTFILES_HOME/
+   fi
+}
+
+_remove() {
+   local f=$1
+   local t=$2
+   
+   echo "Removing $t ~/$f ..."
+   rm -rf ~/$f
+}
+
+OP=$1
+OPTS='list|install|diff|update|remove'
+DF=~/.dotfiles
+
+[ "$OP" ] || { echo "You must specify one of the options: $OPTS"; exit 1; }
+
+case $OP in
+   dir) 
+      echo "DOTFILES_HOME=$DOTFILES_HOME"
+      exit 0
+      ;;
+   list|install|diff|update|remove)
+      if [ "$OP" = "install" ]
+      then
+         if ! [ "$DOTFILES_HOME" ]
+         then
+            DOTFILES_HOME=`cd $(dirname $0)/..; echo -n $PWD`
+            echo "Writing $DF with the following content:"
+            echo "export DOTFILES_HOME=$DOTFILES_HOME" > $DF
+            cat $DF
+         fi
+
+         f="$DOTFILES_HOME/.pj-functions"
+         if [ -f "$f" ]
+         then
+            source "$f" && dotstart_install
+         fi
+      fi
+
+      [ "$DOTFILES_HOME" ] || { echo "You must configure DOTFILES_HOME to use this script! Nothing to do!"; exit 1; }
+
+      _dotfiles _$OP
+
+      [ "$OP" = "install" ] && echo "Files installed! Remember to restart your shell!"
+      if [ "$OP" = "remove" ]
+      then
+         echo "Removing file $DF ..."
+         rm $DF; 
+         echo "Files removed!"; 
+      fi
+      ;;
+   *) 
+      echo "\"$OP\" is an invalid option!"
+      ;;
+esac

@@ -1,0 +1,1 @@
+Dot files (.file) with some configurations used in my notebook (Mac OS X operational system) and very basic utilities written in Bash, Python or other some script languages. Most of then are very tied to my environment so, if you want use this in your own, you will have to adapt to your needs.

@@ -1,0 +1,64 @@
+#!/bin/bash
+# Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+# Some utility functions
+
+# Default syntax for 'sed -i' command
+export sed_i='sed -i'
+
+# Specific dot file loaded by .bashrc or .profile for this system
+export dotstart=~/.`hostname -s`
+
+# Change some defaults for specific systems
+case `uname` in
+   Darwin)
+      sed_i='sed -i ""'
+      ;;
+esac
+
+# Insert code on .profile (or .bashrc) to load $dotstart file
+dotstart_install() {
+   local profile=~/.profile
+   local search_str='# Load startup environment for this machine'
+
+   case `uname` in
+      Linux)
+         profile=~/.bashrc
+         ;;
+   esac
+
+   [ -f $profile ] || touch $profile
+
+   grep "^$search_str" $profile &> /dev/null
+   if [ $? = 1 ]; then
+      echo "Changing $profile to load $dotstart file ..."
+      echo -e "\n$search_str" >> $profile
+      echo -e "f=$dotstart; [ -f \"\$f\" ] && source \"\$f\"" >> $profile
+   fi
+}
+
+# Show PATH, one per line, listing ordered
+showpath() {
+   echo $PATH | tr : '\n' | tail -r
+}
+
+# Change the loaded environment configured at this file
+setenv() {
+  local env=$1
+
+  if [ -f "$env" ]; then
+    $sed_i "s,^\(export ENVIRONMENT=\)\(.*\),\1$env,g" $dotstart
+  else
+    echo "The file \"$env\" does'nt exists! Nothing was done."
+  fi
+}
+
+# Change the loaded proxy configured at this file
+setproxy() {
+  local proxy=$1
+
+  $sed_i "s,^\(export PROXY=\)\(.*\),\1$proxy,g" $dotstart
+
+  if [ ! -f "$proxy" ]; then
+    echo "The file \"$proxy\" does'nt exists! Proxy settings will not be done."
+  fi
+}

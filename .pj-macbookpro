@@ -1,0 +1,35 @@
+#!/bin/bash
+# Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+# File ~/.pj-macbookpro (loaded by each opened shell) when logged as pj@pj-macbookpro
+
+# My scripts support
+export PATH=~/Scripts:$PATH
+
+# MacPorts support
+export MACPORTS_HOME=~/Work/MacPorts
+export PATH=$MACPORTS_HOME/bin:$PATH
+export MANPATH=$MACPORTS_HOME/share/man:$MANPATH
+
+# MySQL support
+export MYSQL_HOME=/usr/local/mysql
+export PATH=$MYSQL_HOME/bin:$PATH
+
+# Current environment
+export ENVIRONMENT=/Users/pj/curso-jboss/ambiente
+[ -f "$ENVIRONMENT" ] && source "$ENVIRONMENT"
+
+# Current setproxy
+export PROXY=off
+[ -f "$PROXY" ] && source "$PROXY"
+
+# Load some utility aliases and functions ...
+f=~/.pj-functions; [ -f "$f" ] && source "$f"
+
+# Configure the PS1 variable (prompt)
+f=~/.ps1; [ -f "$f" ] && source "$f"
+
+# File ~/.dotfiles must export a variable DOTFILES_HOME with a hard coded path in this filesystem for github dotfiles repo!
+f=~/.dotfiles; [ -f "$f" ] && source "$f"
+
+# unset f variable
+unset f

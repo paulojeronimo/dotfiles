@@ -1,0 +1,16 @@
+#!/bin/bash
+# Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+
+KEY="$HOME/.ssh/id_rsa.pub"
+HOST=$1
+
+[ ! -f $KEY ] && { echo "I can't find the key \"$KEY\". Please, generate it!"; exit; }
+[ -z $HOST ] && { echo "Please specify user@host to this script"; exit; }
+
+echo "Putting your key on $HOST... "
+
+cat $KEY | ssh $HOST '
+   f=~/.ssh/authorized_keys; d=`dirname $f`
+   mkdir -p $d; chmod 700 $d
+   cat - >> $f; chmod 640 $f
+'

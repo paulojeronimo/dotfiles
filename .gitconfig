@@ -1,0 +1,9 @@
+[user]
+	email = pj@paulojeronimo.info
+	name = Paulo Jerônimo
+[color]
+	status = true
+	branch = true
+	interactive = true
+	diff = true
+	ui = true
