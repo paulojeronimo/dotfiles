@@ -2,7 +2,7 @@
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 
 # Dot files (and other dirs/files) included in this repo, excluding README.* files and .git dir.
-DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -name $DOTFILES_HOME -o -name .git -o -name README.\* \)'
+DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* \)'
 
 _dotfiles() {
    local f
