@@ -77,6 +77,7 @@ case $OP in
       exit 0
       ;;
    list|install|diff|update|remove)
+      # pre-operations
       if [ "$OP" = "install" ]
       then
          if ! [ "$DOTFILES_HOME" ]
@@ -94,11 +95,28 @@ case $OP in
          fi
       fi
 
-      [ "$DOTFILES_HOME" ] || { echo "You must configure DOTFILES_HOME to use this script! Nothing to do!"; exit 1; }
+      if [ ! "$DOTFILES_HOME" ]
+      then
+         echo "You must configure DOTFILES_HOME to use this script! Nothing to do!"
+         exit 1
+      fi
 
+      # do operation
       _dotfiles _$OP
 
-      [ "$OP" = "install" ] && echo "Files installed! Remember to restart your shell!"
+      # pos-operations
+      if [ "$OP" = "install" ]
+      then 
+         if [ -f "$DOTSTART_FILE" ]
+         then
+            echo "File \"$DOTSTART_FILE\" exists! Using it!"
+         else
+            echo "File \"$DOTSTART_FILE\" does not exists! Creating it from \"$SAMPLE_DOTSTART_FILE\"!"
+            cp -a "$SAMPLE_DOTSTART_FILE" "$DOTSTART_FILE"
+         fi
+         echo "Files installed! Remember to restart your shell!"
+      fi
+
       if [ "$OP" = "remove" ]
       then
          echo "Removing file $DF ..."

@@ -6,7 +6,10 @@
 export sed_i='sed -i'
 
 # Specific dot file loaded by .bashrc or .profile for this system
-export dotstart=~/.`hostname -s`
+export DOTSTART_FILE=~/.`hostname -s`
+
+# Sample dot file used to create $DOTSTART_FILE if it does'nt exists
+export SAMPLE_DOTSTART_FILE=~/.sample-pj
 
 # Change some defaults for specific systems
 case `uname` in
@@ -15,7 +18,7 @@ case `uname` in
       ;;
 esac
 
-# Insert code on .profile (or .bashrc) to load $dotstart file
+# Insert code on .profile (or .bashrc) to load $DOTSTART_FILE file
 dotstart_install() {
    local profile=~/.profile
    local search_str='# Load startup environment for this machine'
@@ -30,9 +33,9 @@ dotstart_install() {
 
    grep "^$search_str" $profile &> /dev/null
    if [ $? = 1 ]; then
-      echo "Changing $profile to load $dotstart file ..."
+      echo "Changing $profile to load $DOTSTART_FILE file ..."
       echo -e "\n$search_str" >> $profile
-      echo -e "f=$dotstart; [ -f \"\$f\" ] && source \"\$f\"" >> $profile
+      echo -e "f=$DOTSTART_FILE; [ -f \"\$f\" ] && source \"\$f\"" >> $profile
    fi
 }
 
@@ -46,7 +49,7 @@ setenv() {
   local env=$1
 
   if [ -f "$env" ]; then
-    $sed_i "s,^\(export ENVIRONMENT=\)\(.*\),\1$env,g" $dotstart
+    $sed_i "s,^\(export ENVIRONMENT=\)\(.*\),\1$env,g" $DOTSTART_FILE
   else
     echo "The file \"$env\" does'nt exists! Nothing was done."
   fi
@@ -56,7 +59,7 @@ setenv() {
 setproxy() {
   local proxy=$1
 
-  $sed_i "s,^\(export PROXY=\)\(.*\),\1$proxy,g" $dotstart
+  $sed_i "s,^\(export PROXY=\)\(.*\),\1$proxy,g" $DOTSTART_FILE
 
   if [ ! -f "$proxy" ]; then
     echo "The file \"$proxy\" does'nt exists! Proxy settings will not be done."
