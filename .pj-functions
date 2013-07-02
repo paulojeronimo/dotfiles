@@ -39,9 +39,9 @@ dotstart_install() {
    fi
 }
 
-# Show PATH, one per line, listing ordered
+# Show PATH, one per line
 showpath() {
-   echo $PATH | tr : '\n' | tail -r
+   echo $PATH | tr : '\n'
 }
 
 # Change the loaded environment configured at this file
@@ -64,4 +64,23 @@ setproxy() {
   if [ ! -f "$proxy" ]; then
     echo "The file \"$proxy\" does'nt exists! Proxy settings will not be done."
   fi
+}
+
+# Install Java plugin for mozilla
+java_mozilla_install() {
+   local dir="$HOME/.mozilla/plugins"
+   local plugin="$JAVA_HOME/jre/lib/amd64/libnpjp2.so"
+   case `uname` in
+      Darwin|Cygwin)
+         echo 'This is a Linux specific function!'
+         return
+         ;;
+   esac
+   mkdir -p $dir && cd $dir
+   if [ ! -f "$plugin" ]; then
+      echo "The \"$plugin\" file was not found!"
+      return 1
+   fi
+   ln -sf $plugin
+   cd - &> /dev/null
 }

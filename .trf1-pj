@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
-# File ~/.sample-pj (template to your initial configuration)
+# File ~/.trf-1 (environment configurations for my machine at TRF-1)
 # This file will be copied to "~/.`hostname -s`" 
 #   after command 'dotfiles install' if it does'nt exists
 
@@ -8,7 +8,7 @@
 export PATH=~/Scripts:$PATH
 
 # Current environment
-export ENVIRONMENT=none
+export ENVIRONMENT=/home/pj/Work/TRF-1/ambiente
 [ -f "$ENVIRONMENT" ] && source "$ENVIRONMENT"
 
 # Current setproxy
