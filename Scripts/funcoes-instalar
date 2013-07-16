@@ -1,0 +1,311 @@
+#!/bin/bash
+# Autor: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+#
+# Funções auxiliares para os scripts "instalar" e "remover"
+
+source "$AMBIENTE_SCRIPTS/funcoes"
+
+# Altera o valor desta variável para, no caso de falhas, terminar a execução dos scripts
+SAI_EM_FALHA=true
+
+# Variável que define o nome dos arquivos e a ordem de busca
+#   no sistema de arquivos, do arquivo que define as variáveis
+#   de ambiente. O primeiro a ser localizado será utilizado.
+ARQS_AMBIENTE="$AMBIENTE_HOME/ambiente,/etc/ambiente"
+
+# Auxiliar da função instala, esta função carrega o arquivo de configurações do usuário,
+#   verifica se os parâmetros necessários foram informados e se eles são válidos.
+carrega_ambiente() {
+
+    # determina a localização do arquivo de ambiente
+    local ambiente
+    local _IFS=$IFS; IFS=$","
+    for f in $ARQS_AMBIENTE; do
+        ambiente=`eval echo "$f"` && [ -r "$ambiente" ] && break
+    done
+    IFS=$_IFS
+
+    echo -n "Carregando informações do arquivo $ambiente... "
+    source "$ambiente" &> $OUT && ok || falha
+}
+
+# Baixa um arquivo de uma URL para o diretório $INSTALADORES_DIR.
+#   Caso o parâmetro --arquivo não seja especificado baixa somente url, senão url/arquivo
+baixa_arquivo() {
+    local arquivo
+    local url
+    local url_completa
+
+    while [ "$1" ]; do
+        case "$1" in
+            --url) shift; url="$1";;
+            --url-completa) shift; url_completa=true;;
+            --arquivo) shift; arquivo="$1";;
+        esac
+        shift
+    done
+
+    [ "$url" ] || falha "O valor para --url não foi informado!"
+    [ "$arquivo" ] || falha "O valor para --arquivo não foi informado!"
+
+    if [ ! "$url_completa" ]; then
+        echo -n "Baixando $arquivo de $url... "
+        url="$url/$arquivo" 
+    else
+        echo -n "Baixando $url... "
+    fi
+
+    (
+        [ "$USA_PROXY" ] || { unset http_proxy; no_proxy=--no-proxy; }
+
+        if [ "$USA_CURL" ]; then
+            curl -o "$INSTALADORES_DIR/$arquivo" "$url" &> $OUT
+        else
+            wget $no_proxy -O "$INSTALADORES_DIR/$arquivo" -c "$url" &> $OUT
+        fi
+    ) && ok || falha
+}
+
+# Auxiliar que ajusta os parâmetros de configuração para a instalação
+verifica_opcs() {
+    local opcs
+    while [ "$1" ]; do
+        case "$1" in
+            --usa-proxy) USA_PROXY=$1;;
+            --nao-usa-proxy) unset USA_PROXY;; 
+            --usa-root) USA_ROOT=$1;;
+            --nao-usa-root) unset USA_ROOT;;
+            --usa-dpkg) USA_DPKG=$1;;
+            --nao-usa-dpkg) unset USA_DPKG;;
+            --usa-yum) USA_YUM=$1;;
+            --nao-usa-yum) unset USA_YUM;;
+            --usa-sudo) SUDO="sudo";;
+            --nao-usa-sudo) unset SUDO;;
+            --usa-curl) USA_CURL=$1;;
+            --nao-usa-curl) unset USA_CURL;;
+            --baixa-arquivo) BAIXA_ARQUIVO=$1;;
+            --nao-baixa-arquivo) unset BAIXA_ARQUIVO;;
+            --tipo) 
+                opcs="$opcs $1"
+                shift; [ "$1" ] || falha "Valor de --tipo não informado!"
+                opcs="$opcs $1"
+                TIPO_APP="$1";;
+            --dir-scripts) 
+                opcs="$opcs $1"
+                shift; [ "$1" ] || falha "Valor de --dir-scripts não informado!"
+                opcs="$opcs $1"
+                DIR_SCRIPTS=`eval echo $1`
+                ;;
+        esac
+        shift
+    done
+
+    # se usa o yum, configura alguns parâmetros...
+    [ "$USA_YUM" ] && {
+       SUDO="sudo"
+       unset BAIXA_ARQUIVO
+    }
+
+    # Opções default!
+    opcs="$opcs ${USA_PROXY:---nao-usa-proxy}"
+    opcs="$opcs ${USA_ROOT:---nao-usa-root}"
+    opcs="$opcs ${USA_DPKG:---nao-usa-dpkg}"
+    opcs="$opcs ${USA_YUM:---nao-usa-yum}"
+    opcs="$opcs ${USA_CURL:---nao-usa-curl}"
+    opcs="$opcs ${BAIXA_ARQUIVO:---nao-baixa-arquivo}"
+
+    echo "Opções:" $opcs
+}
+
+remove_aplicacao() {
+    # remove o link anterior, caso exista
+    [ -L "${!APP_LINK}" ] && {
+        echo -n "Excluindo link simbólico existente (${!APP_LINK})... "
+        rm "${!APP_LINK}" &> $OUT && ok || falha
+    }
+
+    # remove o diretório anterior, caso exista
+    if [ -d "${!APP_DIR}" ]; then
+        echo -n "Excluindo diretório de instalação existente (${!APP_DIR})... "
+        rm -rf "${!APP_DIR}" &> $OUT && ok || falha
+    fi
+}
+
+# Instala uma aplicação no diretório $FERRAMENTAS_DIR
+# Antes disto, faz o download da mesma a partir de uma URL utilizando o baixa_arquivo
+instala_aplicacao() {
+    # link (que também é utilizado como nome curto da aplicação) é obrigatório
+    verifica_var $APP_LINK
+
+    [ "$TIPO_APP" ] && { 
+        type verifica_opcs_$TIPO_APP &> $OUT && verifica_opcs_$TIPO_APP $INSTALA_OPCS
+        type remove_$TIPO_APP &> $OUT && remove_$TIPO_APP || falha "Função remove_$TIPO_APP não encontrada!" 
+    } || remove_aplicacao
+
+    # extrai o conteúdo do instalador
+    echo -n "Descompactando ${!APP_INSTALADOR} em ${!APP_DIR}... "
+    extrai "$INSTALADORES_DIR/${!APP_INSTALADOR}" &> $OUT && ok || falha
+
+    # se quem está instalando é o root
+    [ "`id -u`" -eq 0 ] && {
+        local usuario_da_aplicacao
+        [ "${!APP_USUARIO}" ] && usuario_da_aplicacao=${!APP_USUARIO} || usuario_da_aplicacao=root
+
+        echo -n "Ajustando o dono de ${!APP_DIR} para $usuario_da_aplicacao... "
+        chown -R $usuario_da_aplicacao: ${!APP_DIR} &> $OUT && ok || falha
+    }
+
+    # se o diretório de instalação e o link não são a mesma coisa, cria o link
+    [ "${!APP_DIR}" != "${!APP_LINK}" ] && {
+        echo -n "Criando o link ${!APP_LINK} para ${!APP_DIR}... "
+        ln -s ${!APP_DIR} ${!APP_LINK} &> $OUT && ok || falha
+    }
+}
+
+# Função que carrega o ambiente de instalação/remoção de aplicações
+# montando as variáveis da aplicação, verificando opções e pré-condições
+prepara() {
+    # monta as variáveis da aplicação
+    APP=$(echo "$1" | tr [:lower:] [:upper:]); shift
+    APP_USUARIO=${APP}_USUARIO
+    APP_INSTALADOR=${APP}_INSTALADOR
+    APP_INSTALADOR_URL=${APP}_INSTALADOR_URL
+    APP_INSTALADOR_URL_COMPLETA=${APP}_INSTALADOR_URL_COMPLETA
+    APP_INSTALA_OPCS=${APP}_INSTALA_OPCS
+    APP_DIR=${APP}_DIR
+    APP_LINK=${APP}_LINK
+    APP_PACOTE=${APP}_PACOTE
+
+    # verifica quem chamou esta função para imprimir a informação correta
+    local chamador=`caller 0 | cut -f 2 -d ' '`
+    local operacao
+    case $chamador in
+        instala) operacao=Instalando;;
+        remove) operacao=Removendo;;
+        *) falha "Ooops! A função prepara não foi atualizada para ser chamada por $chamador";;
+    esac
+
+    # se a aplicação não foi informada, não há o que fazer...
+    [ "$APP" ] || falha "Aplicação não informada!"
+
+    # Imprime a operação que será executada
+    echo "== $operacao $APP =="
+
+    # carrega o arquivo de configuração do ambiente
+    carrega_ambiente || falha
+
+    # agrega as opções default, as opções da própria aplicação
+    INSTALA_OPCS=`echo $INSTALA_OPCS ${!APP_INSTALA_OPCS} "$@"`
+
+    # verifica as opções passadas
+    verifica_opcs $INSTALA_OPCS
+
+    # carrega o script de instalação para uma aplicação, se o tipo da mesma for informado
+    [ "$TIPO_APP" ] && {
+      local nome_script="$DIR_SCRIPTS/funcoes-instalar_$TIPO_APP"
+
+      echo -n "Carregando script $nome_script... "
+      source "$nome_script" &> $OUT && ok || falha
+    }
+
+    # se é para a aplicação ser instalada como root, verifica se o usuário é root
+    [ "$USA_ROOT" ] && verifica_root
+
+    if ! [ "$USA_YUM" ]; then
+        # se o diretório de instalação da aplicação é absoluto, 
+        # ajusta o valor da variável FERRAMENTAS_DIR e 
+        # transforma APP_DIR em relativo
+        absoluto ${!APP_DIR} && { 
+            FERRAMENTAS_DIR=${!APP_DIR%/*}
+            eval $APP_DIR=${!APP_DIR##*/}
+            echo "Ajustando o diretório da aplicação para $FERRAMENTAS_DIR/${!APP_DIR}... "
+        }
+
+        # IMPORTANTE! 
+        # As operações instala e remove são realizadas no diretório FERRAMENTAS_DIR
+        echo -n "Mudando para o diretório $FERRAMENTAS_DIR... "
+        mkdir -p "$FERRAMENTAS_DIR" && cd "$FERRAMENTAS_DIR" && ok || falha
+    fi
+}
+
+# Função utilizada para a instalação de uma aplicação.
+# Ela utiliza as variáveis configuradas no $ARQ_AMBIENTE 
+#   para realizar a instalação de uma ferramenta
+instala() {
+    prepara "$@"
+
+    # cria diretórios necessários na execução do instala, caso não existam
+    cria_dir INSTALADORES_DIR
+    cria_dir FERRAMENTAS_DIR
+
+    # verifica se informou o instalador
+    verifica_var $APP_INSTALADOR
+
+    # se não é uma instalação via dpkg ou yum, $APP_DIR é obrigatório
+    [ "$USA_DPKG" -o "$USA_YUM" ] || verifica_var $APP_DIR
+
+    # baixa o instalador, caso necessário
+    if [ "$BAIXA_ARQUIVO" ]; then
+        if [ "${!APP_INSTALADOR_URL_COMPLETA}" ]; then
+            baixa_arquivo --url "${!APP_INSTALADOR_URL_COMPLETA}" --arquivo "${!APP_INSTALADOR}" --url-completa
+        else
+            if [ "${!APP_INSTALADOR_URL}" ]; then
+                baixa_arquivo --url "${!APP_INSTALADOR_URL}" --arquivo "${!APP_INSTALADOR}" 
+            else
+                verifica_var INSTALADORES_URL
+                baixa_arquivo --url "$INSTALADORES_URL" --arquivo "${!APP_INSTALADOR}" 
+            fi
+        fi
+    fi
+
+    # se a instalação é via dpkg, realiza e vai embora ou dá o erro...
+    [ "$USA_DPKG" ] && {
+        echo -n "Utilizando o dpkg... "
+        dpkg -i "$INSTALADORES_DIR/${!APP_INSTALADOR}" &> $OUT && { ok; return $?; } || falha
+    }
+
+    # se a instalação é via yum, realiza e vai embora ou dá o erro...
+    [ "$USA_YUM" ] && {
+        echo "Instalando via yum ..."
+        $SUDO yum -y install "${!APP_INSTALADOR}" && return $? || falha "Erro na execução do yum!"
+    }
+
+    # se foi especificado um usuário para rodar a aplicação, cria-o caso ele não exista
+    [ "${!APP_USUARIO}" ] && {
+        grep -w "^${!APP_USUARIO}" /etc/passwd &> /dev/null || {
+            echo -n "Criando o usuário ${!APP_USUARIO}... "
+            useradd -m -s /bin/false ${!APP_USUARIO} &> $OUT && ok || falha
+        }
+    }
+
+    # se o tipo da aplicação foi informada, utiliza uma função própria para o tipo
+    # caso contrário, utiliza o instala_aplicacao
+    [ "$TIPO_APP" ] && { 
+        type verifica_opcs_$TIPO_APP &> $OUT && verifica_opcs_$TIPO_APP $INSTALA_OPCS
+        type instala_$TIPO_APP &> $OUT && instala_$TIPO_APP || falha "Função instala_$TIPO_APP não encontrada!" 
+    } || instala_aplicacao
+}
+
+remove() {
+    prepara "$@"
+
+    [ "$USA_DPKG" ] && {
+        echo -n "Utilizando o dpkg... "
+        verifica_var $APP_PACOTE
+        dpkg -r ${!APP_PACOTE} &> $OUT && { ok; return $?; } || falha
+    }
+
+    [ "$USA_YUM" ] && {
+        echo "Removendo via yum ..."
+        $SUDO yum -y remove ${!APP_INSTALADOR} && return $? || falha "Erro na execução do yum!"
+    }
+
+    verifica_var FERRAMENTAS_DIR
+    verifica_var $APP_DIR
+    verifica_var $APP_LINK
+
+    [ "$TIPO_APP" ] && { 
+        type verifica_opcs_$TIPO_APP &> $OUT && verifica_opcs_$TIPO_APP $INSTALA_OPCS
+        type remove_$TIPO_APP &> $OUT && remove_$TIPO_APP || falha "Função remove_$TIPO_APP não encontrada!" 
+    } || remove_aplicacao
+}

@@ -1,0 +1,18 @@
+#!/bin/bash
+# Autor: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+
+# Carrega as funções
+source "$AMBIENTE_SCRIPTS/funcoes-instalar"
+
+# Obtem o nome da aplicação que será instalada (variável app).
+#   Esta variável é obtida pelo nome de um script que começará com 'instalar-'
+#   Ou, também pode ser obtida como parâmetro para este script.
+#   Ppor exemplo, se houver um link simbólico instalar-ant apontando para este script
+#   o nome da app será ant.
+script=`basename "$0"`; app=`echo -n ${script#instalar-}`
+
+# Se o nome da aplicação não foi passado, falha...
+[ "$app" = "instalar" ] && { [ "$1" ] && { app="$1"; shift; } || falha "Aplicação não informada!"; }
+
+# Instala a aplicação informada
+instala $app "$@"
