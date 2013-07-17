@@ -8,9 +8,6 @@ export sed_i='sed -i'
 # Specific dot file loaded by .bashrc or .profile for this system
 export DOTSTART_FILE=~/.`hostname -s`
 
-# Sample dot file used to create $DOTSTART_FILE if it does'nt exists
-export SAMPLE_DOTSTART_FILE=~/.sample-pj
-
 # Change some defaults for specific systems
 case `uname` in
    Darwin)

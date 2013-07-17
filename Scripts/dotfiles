@@ -1,9 +1,8 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+# Useful script operate dotfiles (files starting with a "." and located at $HOME)
 
-# Dot files (and other dirs/files) included in this repo, excluding README.* files and .git dir.
-DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* \)'
-
+# Do an operation at files specified by $DOTFILES
 _dotfiles() {
    local f
    local t
@@ -18,6 +17,7 @@ _dotfiles() {
    done
 }
 
+# Show a file and its type (file or dir)
 _list() {
    local f=$1
    local t=$2
@@ -25,6 +25,7 @@ _list() {
    echo "$f ($t)"
 }
 
+# Install a file at ~/
 _install() {
    local f=$1
    local t=$2
@@ -35,6 +36,7 @@ _install() {
    cp -a $DOTFILES_HOME/$f ~/
 }
 
+# Show differences between a file at ~/ and its original in $DOTFILES_HOME/
 _diff() {
    local f=$1
    local t=$2
@@ -43,6 +45,7 @@ _diff() {
    diff -uNr ~/$f $DOTFILES_HOME/$f
 }
 
+# Update a file from ~/ to $DOTFILES_HOME/
 _update() {
    local f=$1
    local t=$2
@@ -57,6 +60,7 @@ _update() {
    fi
 }
 
+# Remove a file from ~/
 _remove() {
    local f=$1
    local t=$2
@@ -64,6 +68,12 @@ _remove() {
    echo "Removing $t ~/$f ..."
    rm -rf ~/$f
 }
+
+# Dot files (and other dirs/files) included in this repo, excluding README.* files and .git dir.
+DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* \)'
+
+# Sample dot file used to create $DOTSTART_FILE if it does'nt exists
+SAMPLE_DOTSTART_FILE=~/.sample-dotstart
 
 OP=$1
 OPTS='list|install|diff|update|remove'
@@ -88,7 +98,7 @@ case $OP in
             cat $DF
          fi
 
-         f="$DOTFILES_HOME/.pj-functions"
+         f="$DOTFILES_HOME/.my-functions"
          if [ -f "$f" ]
          then
             source "$f" && dotstart_install

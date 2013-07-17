@@ -23,7 +23,7 @@ export PROXY=off
 [ -f "$PROXY" ] && source "$PROXY"
 
 # Load some utility aliases and functions ...
-f=~/.pj-functions; [ -f "$f" ] && source "$f"
+f=~/.my-functions; [ -f "$f" ] && source "$f"
 
 # Configure the PS1 variable (prompt)
 f=~/.ps1; [ -f "$f" ] && source "$f"

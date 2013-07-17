@@ -1,8 +1,6 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 # File ~/.trf1-pj (environment configurations for my machine at TRF1)
-# This file will be copied to "~/.`hostname -s`" 
-#   after command 'dotfiles install' if it does'nt exists
 
 # My scripts support
 export PATH=~/Scripts:$PATH
@@ -16,7 +14,7 @@ export PROXY=none
 [ -f "$PROXY" ] && source "$PROXY"
 
 # Load some utility aliases and functions ...
-f=~/.pj-functions; [ -f "$f" ] && source "$f"
+f=~/.my-functions; [ -f "$f" ] && source "$f"
 
 # Configure the PS1 variable (prompt)
 f=~/.ps1; [ -f "$f" ] && source "$f"
