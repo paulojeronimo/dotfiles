@@ -2,14 +2,12 @@
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 
 KEY="$HOME/.ssh/id_rsa.pub"
-HOST=$1
+SSH_PARAMS=$@
 
 [ ! -f $KEY ] && { echo "I can't find the key \"$KEY\". Please, generate it!"; exit; }
-[ -z $HOST ] && { echo "Please specify user@host to this script"; exit; }
+[ "$SSH_PARAMS" ] || { echo "No parameters specified. Nothing to do!"; exit; }
 
-echo "Putting your key on $HOST... "
-
-cat $KEY | ssh $HOST '
+cat $KEY | ssh $SSH_PARAMS '
    f=~/.ssh/authorized_keys; d=`dirname $f`
    mkdir -p $d; chmod 700 $d
    cat - >> $f; chmod 640 $f

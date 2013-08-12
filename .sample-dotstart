@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
-# File ~/.sample-pj (template to your initial configuration)
+# File ~/.sample-dotstart (template to your initial configuration)
 # This file will be copied to "~/.`hostname -s`" 
 #   after command 'dotfiles install' if it does'nt exists
 
