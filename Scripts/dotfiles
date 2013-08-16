@@ -11,7 +11,16 @@ _dotfiles() {
    for f in `eval $DOTFILES`
    do
       f=${f##*/}
-      [ -f "$f" ] && t=file || t=dir
+
+      if [ -f "$f" ]
+      then
+         t=file
+      elif [ -L "$f" ]
+      then
+         t=link
+      else
+         t=dir
+      fi
 
       $op $f $t
    done
@@ -70,7 +79,7 @@ _remove() {
 }
 
 # Dot files (and other dirs/files) included in this repo, excluding README.* files and .git dir.
-DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* \)'
+DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* -o -name install -o -name remove \)'
 
 # Sample dot file used to create $DOTSTART_FILE if it does'nt exists
 SAMPLE_DOTSTART_FILE=~/.sample-dotstart
