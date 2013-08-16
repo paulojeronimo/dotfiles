@@ -3,11 +3,11 @@ Dot files (.file) with some configurations used in my notebook and employer's wo
 To start using it in you own enviroment, you will need to do:
 ```bash
 $ git clone http://github.com/paulojeronimo/dotfiles.git 
-$ ./install
+$ ./dotfiles/install
 ```
 
 Want remove? Very simple!! ;) Only do this:
 
 ```bash
-$ ./remove
+$ ./dotfiles/remove
 ```
