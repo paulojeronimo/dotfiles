@@ -6,16 +6,19 @@
 export PATH=~/Scripts:$PATH
 
 # MacPorts support
-export MACPORTS_HOME=~/Work/MacPorts
-export PATH=$MACPORTS_HOME/bin:$PATH
+export MACPORTS_HOME=/opt/local
+export PATH=$MACPORTS_HOME/bin:$MACPORTS_HOME/sbin:$PATH
 export MANPATH=$MACPORTS_HOME/share/man:$MANPATH
 
 # MySQL support
 export MYSQL_HOME=/usr/local/mysql
 export PATH=$MYSQL_HOME/bin:$PATH
 
+# Editor configuration
+export EDITOR=/usr/bin/vim
+
 # Current environment
-export ENVIRONMENT=/Users/pj/curso-jboss/ambiente
+export ENVIRONMENT=/Users/pj/Work/Java/ambiente
 [ -f "$ENVIRONMENT" ] && source "$ENVIRONMENT"
 
 # Current setproxy
@@ -28,8 +31,42 @@ f=~/.my-functions; [ -f "$f" ] && source "$f"
 # Configure the PS1 variable (prompt)
 f=~/.ps1; [ -f "$f" ] && source "$f"
 
-# File ~/.dotfiles must export a variable DOTFILES_HOME with a hard coded path in this filesystem for github dotfiles repo!
-f=~/.dotfiles; [ -f "$f" ] && source "$f"
+# File ~/.dotfiles/home must export a variable DOTFILES_HOME with a hard coded path in this filesystem for github dotfiles repo!
+f=~/.dotfiles/home; [ -f "$f" ] && source "$f"
 
 # unset f variable
 unset f
+
+# show/hidde files on OS X
+showHiddenFiles() {
+   local op=`echo -n ${1:-true} | tr '[:lower:]' '[:upper:]'`
+
+   case $op in
+      TRUE|FALSE);;
+      *)
+         echo 'Informe "true" ou "false"!'
+         return 1
+   esac
+
+   defaults write com.apple.finder AppleShowAllFiles $op
+   killall Finder
+}
+
+# prevent .DS_Store file creation over the network connections
+# Refs: 
+#   http://support.apple.com/kb/ht1629
+#   http://osxdaily.com/2010/02/03/how-to-prevent-ds_store-file-creation/
+# Related:
+#   http://www.aorensoftware.com/blog/2011/12/24/death-to-ds_store/
+disableDotDS_Store() {
+   local op=`echo -n ${1:-true} | tr '[:lower:]' '[:upper:]'`
+   
+   case $op in
+      TRUE|FALSE);;
+      *)
+         echo 'Informe "true" ou "false"!'
+         return 1
+   esac
+
+   defaults write com.apple.desktopservices DSDontWriteNetworkStores $op
+}

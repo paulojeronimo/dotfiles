@@ -1,8 +1,7 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
-# File ~/.sample-dotstart (template to your initial configuration)
-# This file will be copied to "~/.`hostname -s`" 
-#   after command 'dotfiles install' if it does'nt exists
+#
+# File DOTSTART_FILE: generated from .dotfiles/dotstart after command 'dotfiles install' if it does'nt exists
 
 # My scripts support
 export PATH=~/Scripts:$PATH
@@ -21,8 +20,8 @@ f=~/.my-functions; [ -f "$f" ] && source "$f"
 # Configure the PS1 variable (prompt)
 f=~/.ps1; [ -f "$f" ] && source "$f"
 
-# File ~/.dotfiles must export a variable DOTFILES_HOME with a hard coded path in this filesystem for github dotfiles repo!
-f=~/.dotfiles; [ -f "$f" ] && source "$f"
+# File ~/.dotfiles/home must export a variable DOTFILES_HOME with a hard coded path in this filesystem for github dotfiles repo!
+f=~/.dotfiles/home; [ -f "$f" ] && source "$f"
 
 # unset f variable
 unset f

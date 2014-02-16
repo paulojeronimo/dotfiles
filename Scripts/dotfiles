@@ -18,8 +18,34 @@ _dotfiles() {
       elif [ -L "$f" ]
       then
          t=link
-      else
+      elif [ -d "$f" ]
+      then
          t=dir
+      else
+         t=removed
+      fi
+
+      # treat MACHINE dotfiles differently
+      if [ "$MACHINES" ]
+      then
+         local is_machine
+         local m
+
+         is_machine=false
+         for m in $MACHINES
+         do
+            if [ "$f" = ".$m" ]
+            then
+               is_machine=true
+               break
+            fi
+         done
+
+         if $is_machine && [ "$f" != ".`hostname -s`" ]
+         then
+            echo "Skipping $t $f"
+            continue
+         fi
       fi
 
       $op $f $t
@@ -39,9 +65,9 @@ _install() {
    local f=$1
    local t=$2
 
-   echo "Installing $t $f at ~/ from $DOTFILES_HOME ..."
+   echo "Installing $t $f at ~/ from $DOTFILES_HOME"
 
-   rm -rf ~/$f
+   [ "$f" = ".dotfiles" ] && find ~/$f -type f ! -name `basename $DOTFILES_HOME_FILE` -delete || rm -rf ~/$f
    cp -a $DOTFILES_HOME/$f ~/
 }
 
@@ -50,7 +76,7 @@ _diff() {
    local f=$1
    local t=$2
 
-   echo "Diff between ~/$f and $DOTFILES_HOME/$f ..."
+   echo "Diff between ~/$f and $DOTFILES_HOME/$f"
    diff -uNr ~/$f $DOTFILES_HOME/$f
 }
 
@@ -59,13 +85,14 @@ _update() {
    local f=$1
    local t=$2
 
-   echo -n "Updating $t $DOTFILES_HOME/$f from ~/ ... "
+   echo -n "Updating $t $DOTFILES_HOME/$f from ~/"
 
    if [ "$t" = "file" ]
    then
       [ ~/$f -nt $DOTFILES_HOME/$f ] && { cp -af ~/$f $DOTFILES_HOME/; echo 'done!'; } || echo 'skipped!'
    else
-      rsync -av --update --delete ~/$f $DOTFILES_HOME/
+      [ "$f" = ".dotfiles" ] && exclude="--exclude=`basename $DOTFILES_HOME_FILE`"
+      rsync -av --update --delete $exclude ~/$f $DOTFILES_HOME/
    fi
 }
 
@@ -74,21 +101,29 @@ _remove() {
    local f=$1
    local t=$2
    
-   echo "Removing $t ~/$f ..."
+   echo "Removing $t ~/$f"
    rm -rf ~/$f
 }
 
-# Dot files (and other dirs/files) included in this repo, excluding README.* files and .git dir.
+# Dot files (and other dirs/files) included in this repo, excluding some not necessary files.
 DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* -o -name install -o -name remove \)'
-
-# Sample dot file used to create $DOTSTART_FILE if it does'nt exists
-SAMPLE_DOTSTART_FILE=~/.sample-dotstart
 
 OP=$1
 OPTS='list|install|diff|update|remove'
-DF=~/.dotfiles
+DOTFILES_HOME_FILE=~/.dotfiles/home
+DOTSTART_TEMPLATE_FILE=~/.dotfiles/dotstart
 
-[ "$OP" ] || { echo "You must specify one of the options: $OPTS"; exit 1; }
+[ "$OP" ] || {
+   echo "You must specify one of the options: $OPTS"
+   exit 1
+}
+echo -n $OPTS | grep -w $OP > /dev/null || {
+   echo "\"$OP\" is an invalid option!"
+   echo "You must specify one of the options: $OPTS"
+   exit 1
+}
+
+echo "Executing \"$OP\" operation:"
 
 case $OP in
    dir) 
@@ -102,15 +137,21 @@ case $OP in
          if ! [ "$DOTFILES_HOME" ]
          then
             DOTFILES_HOME=`cd $(dirname $0)/..; echo -n $PWD`
-            echo "Writing $DF with the following content:"
-            echo "export DOTFILES_HOME=$DOTFILES_HOME" > $DF
-            cat $DF
+            mkdir -p `dirname $DOTFILES_HOME_FILE`
+            echo "Writing $DOTFILES_HOME_FILE with the following content:"
+            echo "export DOTFILES_HOME=$DOTFILES_HOME" | tee $DOTFILES_HOME_FILE
          fi
 
          f="$DOTFILES_HOME/.my-functions"
          if [ -f "$f" ]
          then
             source "$f" && dotstart_install
+         fi
+
+         f="$DOTFILES_HOME/.dotfiles/machines"
+         if [ -f "$f" ]
+         then
+            MACHINES=`cat $f | tr '\n' ' '`
          fi
       fi
 
@@ -130,20 +171,15 @@ case $OP in
          then
             echo "File \"$DOTSTART_FILE\" exists! Using it!"
          else
-            echo "File \"$DOTSTART_FILE\" does not exists! Creating it from \"$SAMPLE_DOTSTART_FILE\"!"
-            cp -a "$SAMPLE_DOTSTART_FILE" "$DOTSTART_FILE"
+            echo "File \"$DOTSTART_FILE\" does not exists! Creating it from \"$DOTSTART_TEMPLATE_FILE\"!"
+            sed "s,DOTSTART_FILE,$DOTSTART_FILE,g" $DOTSTART_TEMPLATE_FILE > $DOTSTART_FILE
          fi
-         echo "Files installed! Remember to restart your shell!"
+         echo "Files installed! For effect, you need to restart your shell!"
       fi
 
       if [ "$OP" = "remove" ]
       then
-         echo "Removing file $DF ..."
-         rm $DF; 
-         echo "Files removed!"; 
+         echo "Files removed! For effect, you need to restart your shell!";
       fi
-      ;;
-   *) 
-      echo "\"$OP\" is an invalid option!"
       ;;
 esac

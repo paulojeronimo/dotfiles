@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASEDIR="`cd $(dirname $0); pwd`"
-SCRIPT=`basename $0`
+BASEDIR=`cd $(dirname "$0"); pwd`
+SCRIPT=`basename "$0"`
 
-$BASEDIR/Scripts/dotfiles $SCRIPT
+"$BASEDIR"/Scripts/dotfiles "$SCRIPT"
