@@ -1,6 +1,7 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
-# File ~/.pj-macbookpro (loaded by each opened shell) when logged as pj@pj-macbookpro
+#
+# File /Users/pj/.pj-osx: generated from .dotfiles/dotstart after command 'dotfiles install' if it does'nt exists
 
 # My scripts support
 export PATH=~/Scripts:$PATH
@@ -18,11 +19,11 @@ export PATH=$MYSQL_HOME/bin:$PATH
 export EDITOR=/usr/bin/vim
 
 # Current environment
-export ENVIRONMENT=/Users/pj/Work/Java/ambiente
+export ENVIRONMENT=none
 [ -f "$ENVIRONMENT" ] && source "$ENVIRONMENT"
 
 # Current setproxy
-export PROXY=off
+export PROXY=none
 [ -f "$PROXY" ] && source "$PROXY"
 
 # Load some utility aliases and functions ...
@@ -36,6 +37,12 @@ f=~/.dotfiles/home; [ -f "$f" ] && source "$f"
 
 # unset f variable
 unset f
+
+# Fix the problem
+# -bash: warning: setlocale: LC_CTYPE: cannot change locale (UTF-8): No such file or directory
+# when ssh to linux
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 
 # show/hidde files on OS X
 showHiddenFiles() {

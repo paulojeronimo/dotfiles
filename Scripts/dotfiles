@@ -85,13 +85,17 @@ _update() {
    local f=$1
    local t=$2
 
-   echo -n "Updating $t $DOTFILES_HOME/$f from ~/"
+   echo -n "Updating $t $DOTFILES_HOME/$f from ~/ ... "
 
    if [ "$t" = "file" ]
    then
       [ ~/$f -nt $DOTFILES_HOME/$f ] && { cp -af ~/$f $DOTFILES_HOME/; echo 'done!'; } || echo 'skipped!'
+   elif [ "$t" = "removed" ]
+   then
+      echo 'skipped!'
    else
       [ "$f" = ".dotfiles" ] && exclude="--exclude=`basename $DOTFILES_HOME_FILE`"
+      echo
       rsync -av --update --delete $exclude ~/$f $DOTFILES_HOME/
    fi
 }
