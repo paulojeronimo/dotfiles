@@ -141,6 +141,11 @@ case $OP in
          if ! [ "$DOTFILES_HOME" ]
          then
             DOTFILES_HOME=`cd $(dirname $0)/..; echo -n $PWD`
+
+            #TODO: insert a fix here: if DOTFILES_HOME is a link, this script will not work!
+            # solution: use a code to get the real path!
+            # a link to read about that: 
+            # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
             mkdir -p `dirname $DOTFILES_HOME_FILE`
             echo "Writing $DOTFILES_HOME_FILE with the following content:"
             echo "export DOTFILES_HOME=$DOTFILES_HOME" | tee $DOTFILES_HOME_FILE
