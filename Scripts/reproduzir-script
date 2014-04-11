@@ -1,0 +1,9 @@
+#!/bin/bash
+# Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+
+SCRIPT_SH=`which script.sh`
+[ ! -n $SCRIPT_SH ] && { echo "O script.sh não está instalado!"; exit 1; }
+SCRIPT_DIR=$1
+[ "$SCRIPT_DIR" ] || { echo "O diretório para a reprodução do script não foi informado!"; exit 1; }
+mkdir -p $SCRIPT_DIR
+(cd $SCRIPT_DIR; $SCRIPT_SH -p session)
