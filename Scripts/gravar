@@ -6,4 +6,4 @@ SCRIPT_SH=`which script.sh`
 SCRIPT_DIR=$1
 [ "$SCRIPT_DIR" ] || { echo "O diretório para a gravação da sessão não foi informado!"; exit 1; }
 mkdir -p $SCRIPT_DIR
-(cd $SCRIPT_DIR; rm sessao; $SCRIPT_SH -r sessao)
+(cd $SCRIPT_DIR; rm -f sessao; $SCRIPT_SH -r sessao)
