@@ -4,7 +4,7 @@
 # File /Users/pj/.pj-osx: generated from .dotfiles/dotstart after command 'dotfiles install' if it does'nt exists
 
 # My scripts support
-export PATH=~/Scripts:$PATH
+export PATH=~/.scripts:$PATH
 
 # MacPorts support
 export MACPORTS_HOME=/opt/local

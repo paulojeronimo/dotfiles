@@ -4,7 +4,7 @@
 # File DOTSTART_FILE: generated from .dotfiles/dotstart after command 'dotfiles install' if it does'nt exists
 
 # My scripts support
-export PATH=~/Scripts:$PATH
+export PATH=~/.scripts:$PATH
 
 # Current environment
 export ENVIRONMENT=none
