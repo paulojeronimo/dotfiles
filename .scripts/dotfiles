@@ -12,12 +12,12 @@ _dotfiles() {
    do
       f=${f##*/}
 
-      if [ -f "$f" ]
-      then
-         t=file
-      elif [ -L "$f" ]
+      if [ -L "$f" ]
       then
          t=link
+      elif [ -f "$f" ]
+      then
+         t=file
       elif [ -d "$f" ]
       then
          t=dir
