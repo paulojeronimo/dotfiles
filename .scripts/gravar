@@ -1,9 +1,18 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
+#
+# Execução:
+#
+# $ gravar DIRETORIO [-c]
 
 SCRIPT_SH=`which script.sh`
 [ ! -n $SCRIPT_SH ] && { echo "O script.sh não está instalado!"; exit 1; }
 SCRIPT_DIR=$1
 [ "$SCRIPT_DIR" ] || { echo "O diretório para a gravação da sessão não foi informado!"; exit 1; }
 mkdir -p $SCRIPT_DIR
-(cd $SCRIPT_DIR; rm -f sessao; $SCRIPT_SH -r sessao)
+shift
+op=$1
+cd $SCRIPT_DIR
+[ "$op" = "-c" ] || rm -f sessao
+$SCRIPT_SH -r sessao
+cd - &> /dev/null

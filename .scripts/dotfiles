@@ -65,39 +65,15 @@ _install() {
    local f=$1
    local t=$2
 
+   case "$f" in
+      .dotfiles|.gitignore)
+      echo "Skipping $t $f"
+      return
+      ;;
+   esac
+
    echo "Installing $t $f at ~/ from $DOTFILES_HOME"
-
-   [ "$f" = ".dotfiles" ] && find ~/$f -type f ! -name `basename $DOTFILES_HOME_FILE` -delete || rm -rf ~/$f
-   cp -a $DOTFILES_HOME/$f ~/
-}
-
-# Show differences between a file at ~/ and its original in $DOTFILES_HOME/
-_diff() {
-   local f=$1
-   local t=$2
-
-   echo "Diff between ~/$f and $DOTFILES_HOME/$f"
-   diff -uNr ~/$f $DOTFILES_HOME/$f
-}
-
-# Update a file from ~/ to $DOTFILES_HOME/
-_update() {
-   local f=$1
-   local t=$2
-
-   echo -n "Updating $t $DOTFILES_HOME/$f from ~/ ... "
-
-   if [ "$t" = "file" ]
-   then
-      [ ~/$f -nt $DOTFILES_HOME/$f ] && { cp -af ~/$f $DOTFILES_HOME/; echo 'done!'; } || echo 'skipped!'
-   elif [ "$t" = "removed" ]
-   then
-      echo 'skipped!'
-   else
-      [ "$f" = ".dotfiles" ] && exclude="--exclude=`basename $DOTFILES_HOME_FILE`"
-      echo
-      rsync -av --update --delete $exclude ~/$f $DOTFILES_HOME/
-   fi
+   ln -s "$DOTFILES_HOME/$f" ~/
 }
 
 # Remove a file from ~/
@@ -113,7 +89,7 @@ _remove() {
 DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* -o -name install -o -name remove \)'
 
 OP=$1
-OPTS='list|install|diff|update|remove'
+OPTS='list|install|remove'
 DOTFILES_HOME_FILE=~/.dotfiles/home
 DOTSTART_TEMPLATE_FILE=~/.dotfiles/dotstart
 
@@ -134,7 +110,7 @@ case $OP in
       echo "DOTFILES_HOME=$DOTFILES_HOME"
       exit 0
       ;;
-   list|install|diff|update|remove)
+   list|install|remove)
       # pre-operations
       if [ "$OP" = "install" ]
       then
@@ -146,7 +122,7 @@ case $OP in
             # solution: use a code to get the real path!
             # a link to read about that: 
             # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
-            mkdir -p `dirname $DOTFILES_HOME_FILE`
+            ln -s "$DOTFILES_HOME/.dotfiles" ~/
             echo "Writing $DOTFILES_HOME_FILE with the following content:"
             echo "export DOTFILES_HOME=$DOTFILES_HOME" | tee $DOTFILES_HOME_FILE
          fi

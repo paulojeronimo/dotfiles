@@ -3,4 +3,4 @@
 BASEDIR=`cd $(dirname "$0"); pwd`
 SCRIPT=`basename "$0"`
 
-"$BASEDIR"/Scripts/dotfiles "$SCRIPT"
+"$BASEDIR"/.scripts/dotfiles "$SCRIPT"

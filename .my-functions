@@ -51,33 +51,3 @@ setenv() {
     echo "The file \"$env\" does'nt exists! Nothing was done."
   fi
 }
-
-# Change the loaded proxy configured at this file
-setproxy() {
-  local proxy=$1
-
-  $sed_i "s,^\(export PROXY=\)\(.*\),\1$proxy,g" $DOTSTART_FILE
-
-  if [ ! -f "$proxy" ]; then
-    echo "The file \"$proxy\" does'nt exists! Proxy settings will not be done."
-  fi
-}
-
-# Install Java plugin for mozilla
-java_mozilla_install() {
-   local dir="$HOME/.mozilla/plugins"
-   local plugin="$JAVA_HOME/jre/lib/amd64/libnpjp2.so"
-   case `uname` in
-      Darwin|Cygwin)
-         echo 'This is a Linux specific function!'
-         return
-         ;;
-   esac
-   mkdir -p $dir && cd $dir
-   if [ ! -f "$plugin" ]; then
-      echo "The \"$plugin\" file was not found!"
-      return 1
-   fi
-   ln -sf $plugin
-   cd - &> /dev/null
-}
