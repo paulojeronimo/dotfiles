@@ -22,7 +22,7 @@ _dotfiles() {
       then
          t=dir
       else
-         t=removed
+         continue
       fi
 
       # treat MACHINE dotfiles differently
@@ -86,7 +86,7 @@ _remove() {
 }
 
 # Dot files (and other dirs/files) included in this repo, excluding some not necessary files.
-DOTFILES='find $DOTFILES_HOME -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* -o -name install -o -name remove \)'
+DOTFILES='find $DOTFILES_HOME/ -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* -o -name install -o -name remove \)'
 
 OP=$1
 OPTS='list|install|remove'
@@ -118,11 +118,7 @@ case $OP in
          then
             DOTFILES_HOME=`cd $(dirname $0)/..; echo -n $PWD`
 
-            #TODO: insert a fix here: if DOTFILES_HOME is a link, this script will not work!
-            # solution: use a code to get the real path!
-            # a link to read about that: 
-            # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
-            ln -s "$DOTFILES_HOME/.dotfiles" ~/
+            ln -s "${DOTFILES_HOME/$HOME\/}/.dotfiles" ~/
             echo "Writing $DOTFILES_HOME_FILE with the following content:"
             echo "export DOTFILES_HOME=$DOTFILES_HOME" | tee $DOTFILES_HOME_FILE
          fi
