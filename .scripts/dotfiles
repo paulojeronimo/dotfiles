@@ -73,7 +73,7 @@ _install() {
    esac
 
    echo "Installing $t $f at ~/ from $DOTFILES_HOME"
-   ln -s "$DOTFILES_HOME/$f" ~/
+   ln -s "${DOTFILES_HOME/$HOME\/}/$f" ~/
 }
 
 # Remove a file from ~/
