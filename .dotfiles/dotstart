@@ -23,6 +23,8 @@ f=~/.ps1; [ -f "$f" ] && source "$f"
 # File ~/.dotfiles/home must export a variable DOTFILES_HOME with a hard coded path in this filesystem for github dotfiles repo!
 f=~/.dotfiles/home; [ -f "$f" ] && source "$f"
 
+# The following message will only showed when we started a login shell:
+shopt -q login_shell && \
 date +"Sessão iniciada em %F às %T"
 
 # unset f variable

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 # Useful script operate dotfiles (files starting with a "." and located at $HOME)
+set +x
 
 # Do an operation at files specified by $DOTFILES
 _dotfiles() {
@@ -12,13 +13,13 @@ _dotfiles() {
    do
       f=${f##*/}
 
-      if [ -L "$f" ]
+      if [ -L "$DOTFILES_HOME/$f" ]
       then
          t=link
-      elif [ -f "$f" ]
+      elif [ -f "$DOTFILES_HOME/$f" ]
       then
          t=file
-      elif [ -d "$f" ]
+      elif [ -d "$DOTFILES_HOME/$f" ]
       then
          t=dir
       else
@@ -52,14 +53,6 @@ _dotfiles() {
    done
 }
 
-# Show a file and its type (file or dir)
-_list() {
-   local f=$1
-   local t=$2
-
-   echo "$f ($t)"
-}
-
 # Install a file at ~/
 _install() {
    local f=$1
@@ -72,7 +65,7 @@ _install() {
       ;;
    esac
 
-   echo "Installing $t $f at ~/ from $DOTFILES_HOME"
+   echo "Linking $t $DOTFILES_HOME/$f to ~/$f"
    ln -s "${DOTFILES_HOME/$HOME\/}/$f" ~/
 }
 
@@ -81,15 +74,15 @@ _remove() {
    local f=$1
    local t=$2
    
-   echo "Removing $t ~/$f"
-   rm -rf ~/$f
+   echo "Unlinking $t ~/$f"
+   rm -f ~/$f
 }
 
 # Dot files (and other dirs/files) included in this repo, excluding some not necessary files.
-DOTFILES='find $DOTFILES_HOME/ -maxdepth 1 ! \( -path $DOTFILES_HOME -o -wholename $DOTFILES_HOME -o -name .git -o -name README.\* -o -name install -o -name remove \)'
+DOTFILES='find $DOTFILES_HOME/ -maxdepth 1 ! \( -wholename $DOTFILES_HOME/ -o -name .git -o -name README.\* -o -name install -o -name remove \)'
 
 OP=$1
-OPTS='list|install|remove'
+OPTS='dir|install|remove'
 DOTFILES_HOME_FILE=~/.dotfiles/home
 DOTSTART_TEMPLATE_FILE=~/.dotfiles/dotstart
 
@@ -110,7 +103,7 @@ case $OP in
       echo "DOTFILES_HOME=$DOTFILES_HOME"
       exit 0
       ;;
-   list|install|remove)
+   install|remove)
       # pre-operations
       if [ "$OP" = "install" ]
       then
