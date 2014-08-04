@@ -2,18 +2,16 @@
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 # Some utility functions
 
-# Default syntax for 'sed -i' command
-export sed_i='sed -i'
-
 # Specific dot file loaded by .bashrc or .profile for this system
 export DOTSTART_FILE=~/.`hostname -s`
 
 # Change some defaults for specific systems
-case `uname` in
-   Darwin)
-      sed_i='sed -i ""'
-      ;;
-esac
+sed_i() {
+   case `uname` in
+      Darwin) sed -i "" "$@";;
+      Linux|Cygwin) sed -i "$@";;
+   esac
+}
 
 # Insert code on .profile (or .bashrc) to load $DOTSTART_FILE file
 dotstart_install() {
@@ -46,7 +44,7 @@ setenv() {
   local env=$1
 
   if [ -f "$env" ]; then
-    $sed_i "s,^\(export ENVIRONMENT=\)\(.*\),\1$env,g" $DOTSTART_FILE
+    sed_i "s,^\(export ENVIRONMENT=\)\(.*\),\1\"$env\",g" $DOTSTART_FILE
   else
     echo "The file \"$env\" does'nt exists! Nothing was done."
   fi
