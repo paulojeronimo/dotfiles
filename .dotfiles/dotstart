@@ -1,31 +1,20 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 #
-# File DOTSTART_FILE: generated from .dotfiles/dotstart after command 'dotfiles install' if it does'nt exists
+# Arquivo DOTSTART_FILE (gerado a partir do .dotfiles/dotstart)
 
-# My scripts support
+# Carrega variáveis e funções
+source ~/.dotfiles/home || return $?
+for f in ~/.{configuracoes,funcoes}/diversas.sh; do source $f || return $?; done
+for f in configuracoes funcoes; do carregar_arquivos_em ~/.$f{,/`uname`}; done
+unset f
+
+# Configura o PATH
 export PATH=~/.scripts:$PATH
 
-# Current environment
-export ENVIRONMENT=none
-[ -f "$ENVIRONMENT" ] && source "$ENVIRONMENT"
+# Ajusta e carrega o ambiente (se ele não for /dev/null)
+export ENVIRONMENT=/dev/null
+[ "$ENVIRONMENT" != /dev/null ] && [ -f "$ENVIRONMENT" ] && source "$ENVIRONMENT"
 
-# Current setproxy
-export PROXY=none
-[ -f "$PROXY" ] && source "$PROXY"
-
-# Load some utility aliases and functions ...
-f=~/.my-functions; [ -f "$f" ] && source "$f"
-
-# Configure the PS1 variable (prompt)
-f=~/.ps1; [ -f "$f" ] && source "$f"
-
-# File ~/.dotfiles/home must export a variable DOTFILES_HOME with a hard coded path in this filesystem for github dotfiles repo!
-f=~/.dotfiles/home; [ -f "$f" ] && source "$f"
-
-# The following message will only showed when we started a login shell:
-shopt -q login_shell && \
-date +"Sessão iniciada em %F às %T"
-
-# unset f variable
-unset f
+# Apresenta a data e a hora da sessão (se estivermos num login shell)
+shopt -q login_shell && date +"Sessão iniciada em %F às %T"

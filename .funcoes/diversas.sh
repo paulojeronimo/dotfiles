@@ -1,30 +1,67 @@
 #!/bin/bash
 # Autor: Paulo Jerônimo (@paulojeronimo, @paulojeronimo.info)
 #
-# Funções e aliases auxiliares. Carregado por scripts.
+# Funções diversas
 
-# Arquivo utilizado para guardar a saída do último comando executado
-[ "$0" != "-bash" ] && OUT=`d=/tmp/$AMBIENTE_DIR-$USER/$(basename "$0") && mkdir -p $d && cd $d && echo -n $d/$$.log`
+# Imprime "ok"
+ok() { echo "ok!"; }
 
-# Imprime "Ok" após operações
-ok() { 
-    echo Ok
-}
-
-# Imprime "Falhou!" e encerra um script (ou função).
+# Imprime "falhou!" e encerra um script (ou função).
 #   Exibe o status de erro do último comando e imprime o conteúdo do arquivo $OUT 
 #   Utiliza as variáveis globais $OUT e $SAI_EM_FALHA:
-#   $OUT é o arquivo que contendo a saída do último comando e deverá estar definido.
-#   $SAI_EM_FALHA é um flag que, se não existir, forçará a saída por um return ao invés de um exit.
 falha() {
     local status=$?
     local msg="$1"
 
-    [ "$msg" ] && echo "Falhou! Motivo: $1" | tee "$OUT" || {
-        echo -e "Falhou!\nCódigo do erro: $status. Saída do último comando:"
+    [ "$msg" ] && echo "falhou! Motivo: $msg" | tee "$OUT" || {
+        echo -e "falhou!\nCódigo do erro: $status. Saída do último comando:"
         cat "$OUT"
     }
-    [ "$SAI_EM_FALHA" ] && exit $status || return $status
+    $SAI_EM_FALHA && exit $status || return $status
+}
+
+# Carrega variáveis e/ou funções no shell corrente
+carregar_arquivo() {
+   local f=$1
+   local ok
+
+   $VERBOSO && echo -n "carregando o arquivo \"$f\" ... "
+   $VERBOSO && { source "$f" &> "$OUT" && ok || falha; } || source "$f"
+}
+
+
+# Carrega variáveis e/ou funções nos arquivos *.sh de diretórios específicos
+carregar_arquivos_em() {
+   local diretorios="$@"
+   local d
+   local f
+
+   for d in $diretorios
+   do
+      if [ -d "$d" ]
+      then
+         shopt -s nullglob
+         for f in "$d"/*.sh; do carregar_arquivo "$f"; done
+         shopt -u nullglob
+      else
+         $VERBOSO && falha "\"$d\" não é um diretório válido!" || true
+      fi
+   done
+}
+
+# Show PATH, one per line
+showpath() { echo $PATH | tr : '\n'; }
+
+# Change the loaded environment configured at this file
+setenv() {
+  local env=$1
+  local DOTSTART_FILE=~/.`hostname -s`
+
+  if [ -f "$env" -o "$env" == /dev/null ]; then
+    sed_i "s,^\(export ENVIRONMENT=\)\(.*\),\1\"$env\",g" $DOTSTART_FILE
+  else
+    echo "The file \"$env\" does'nt exists! Nothing was done."
+  fi
 }
 
 # Testa se o usuário que está executando esta função é root e falha, caso não seja
@@ -200,15 +237,10 @@ path_canonical() {
 }
 
 # Ajusta um prompt simples
-prompt_simples() {
-  export OLD_PS1=$PS1
-  export PS1='\$ '
-}
+prompt_simples() { export OLD_PS1=$PS1; export PS1='\$ '; }
 
 # Retorna o prompt anterior, caso exista
-prompt_anterior() {
-  [ "$OLD_PS1" ] && { export PS1=$OLD_PS1; unset OLD_PS1; }
-}
+prompt_anterior() { [ "$OLD_PS1" ] && { export PS1=$OLD_PS1; unset OLD_PS1; }; }
 
 # Formata um arquivo XML preservando seus atritubos no sistema de arquivos
 xml_format() {
@@ -218,4 +250,15 @@ xml_format() {
   cp -a "$f" "$tmp"
   xmllint --format "$tmp/$f" > "$f"
   rm "$tmp/$f"
+}
+
+# Procura por um arquivo que contenha o nome especificado (expressão regular)
+#   no diretório atual e abaixo
+findf() {
+   find . -type f -print0 | egrep "$@"
+}
+
+# Procura por uma string (expressão regular), dentro de um arquivo no diretório atual e abaixo
+grepf() {
+   find . -type f -print0 | xargs -0 egrep "$@"
 }

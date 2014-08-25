@@ -1,79 +1,20 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 #
-# File /Users/pj/.pj-osx: generated from .dotfiles/dotstart after command 'dotfiles install' if it does'nt exists
+# Arquivo DOTSTART_FILE (gerado a partir do .dotfiles/dotstart)
 
-# My scripts support
-export PATH=~/.scripts:$PATH
-
-# MacPorts support
-export MACPORTS_HOME=/opt/local
-export PATH=$MACPORTS_HOME/bin:$MACPORTS_HOME/sbin:$PATH
-export MANPATH=$MACPORTS_HOME/share/man:$MANPATH
-
-# MySQL support
-export MYSQL_HOME=/usr/local/mysql
-export PATH=$MYSQL_HOME/bin:$PATH
-
-# Editor configuration
-export EDITOR=/usr/bin/vim
-
-# Current environment
-export ENVIRONMENT=none
-[ -f "$ENVIRONMENT" ] && source "$ENVIRONMENT"
-
-# Current setproxy
-export PROXY=none
-[ -f "$PROXY" ] && source "$PROXY"
-
-# Load some utility aliases and functions ...
-f=~/.my-functions; [ -f "$f" ] && source "$f"
-
-# Configure the PS1 variable (prompt)
-f=~/.ps1; [ -f "$f" ] && source "$f"
-
-# File ~/.dotfiles/home must export a variable DOTFILES_HOME with a hard coded path in this filesystem for github dotfiles repo!
-f=~/.dotfiles/home; [ -f "$f" ] && source "$f"
-
-# unset f variable
+# Carrega variáveis e funções
+source ~/.dotfiles/home || return $?
+for f in ~/.{configuracoes,funcoes}/diversas.sh; do source $f || return $?; done
+for f in configuracoes funcoes; do carregar_arquivos_em ~/.$f{,/`uname`}; done
 unset f
 
-# Fix the problem
-# -bash: warning: setlocale: LC_CTYPE: cannot change locale (UTF-8): No such file or directory
-# when ssh to linux
-export LC_CTYPE=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
+# Configura o PATH
+export PATH=~/.scripts:$PATH
 
-# show/hidde files on OS X
-showHiddenFiles() {
-   local op=`echo -n ${1:-true} | tr '[:lower:]' '[:upper:]'`
+# Ajusta e carrega o ambiente (se ele não for /dev/null)
+export ENVIRONMENT=/dev/null
+[ "$ENVIRONMENT" != /dev/null ] && [ -f "$ENVIRONMENT" ] && source "$ENVIRONMENT"
 
-   case $op in
-      TRUE|FALSE);;
-      *)
-         echo 'Informe "true" ou "false"!'
-         return 1
-   esac
-
-   defaults write com.apple.finder AppleShowAllFiles $op
-   killall Finder
-}
-
-# prevent .DS_Store file creation over the network connections
-# Refs: 
-#   http://support.apple.com/kb/ht1629
-#   http://osxdaily.com/2010/02/03/how-to-prevent-ds_store-file-creation/
-# Related:
-#   http://www.aorensoftware.com/blog/2011/12/24/death-to-ds_store/
-disableDotDS_Store() {
-   local op=`echo -n ${1:-true} | tr '[:lower:]' '[:upper:]'`
-   
-   case $op in
-      TRUE|FALSE);;
-      *)
-         echo 'Informe "true" ou "false"!'
-         return 1
-   esac
-
-   defaults write com.apple.desktopservices DSDontWriteNetworkStores $op
-}
+# Apresenta a data e a hora da sessão (se estivermos num login shell)
+shopt -q login_shell && date +"Sessão iniciada em %F às %T"

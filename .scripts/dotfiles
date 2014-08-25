@@ -1,14 +1,59 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
-# Useful script operate dotfiles (files starting with a "." and located at $HOME)
+# Useful script to operate my dotfiles (files starting with a "." and located at $HOME)
 set +x
+
+sed_i() {
+   case `uname` in
+      Darwin) sed -i "" "$@";;
+      *) sed -i "$@";;
+   esac
+}
+
+_dotstart_op() {
+   local readonly mark='# Load startup environment for this machine'
+   local op=$1
+   local profile=~/.profile
+   case `uname` in
+      Linux|CYGWIN*) profile=~/.bashrc;;
+   esac
+
+   [ -f $profile ] || touch $profile
+   $1 $profile "$mark"
+}
+
+# Insert code on .profile (or .bashrc) to load $DOTSTART_FILE file
+dotstart_install() {
+   install() {
+      local profile=$1
+      local mark=$2
+      if ! grep -q "^$mark" $profile
+      then
+         echo "Changing $profile to load $DOTSTART_FILE file ..."
+         echo -e "$mark" >> $profile
+         echo -e "f=$DOTSTART_FILE; [ -f \"\$f\" ] && source \"\$f\"; unset f" >> $profile
+      fi
+   }
+   _dotstart_op install
+}
+
+# Remove the code from .profile (or .bashrc) that loads $DOTSTART_FILE file
+dotstart_uninstall() {
+   uninstall() {
+      local profile=$1
+      local mark=$2
+
+      sed_i "/^$mark/{N;d;}" $profile
+   }
+   _dotstart_op uninstall
+}
 
 # Do an operation at files specified by $DOTFILES
 _dotfiles() {
    local f
    local t
    local op=$1
-
+   
    for f in `eval $DOTFILES`
    do
       f=${f##*/}
@@ -79,11 +124,12 @@ _remove() {
 }
 
 # Dot files (and other dirs/files) included in this repo, excluding some not necessary files.
-DOTFILES='find $DOTFILES_HOME/ -maxdepth 1 ! \( -wholename $DOTFILES_HOME/ -o -name .git -o -name README.\* -o -name install -o -name remove \)'
+DOTFILES='find "$DOTFILES_HOME"/ -maxdepth 1 ! \( -wholename "$DOTFILES_HOME"/ -o -name .git -o -name README.\* -o -name install -o -name remove \)'
 
 OP=$1
 OPTS='dir|install|remove'
 DOTFILES_HOME_FILE=~/.dotfiles/home
+DOTSTART_FILE=~/.`hostname -s`
 DOTSTART_TEMPLATE_FILE=~/.dotfiles/dotstart
 
 [ "$OP" ] || {
@@ -109,29 +155,25 @@ case $OP in
       then
          if ! [ "$DOTFILES_HOME" ]
          then
-            DOTFILES_HOME=`cd $(dirname $0)/..; echo -n $PWD`
+            DOTFILES_HOME=`cd "$(dirname "$0")"/..; echo -n $PWD`
 
             ln -s "${DOTFILES_HOME/$HOME\/}/.dotfiles" ~/
             echo "Writing $DOTFILES_HOME_FILE with the following content:"
-            echo "export DOTFILES_HOME=$DOTFILES_HOME" | tee $DOTFILES_HOME_FILE
+            echo "export DOTFILES_HOME=\"$DOTFILES_HOME\"" | tee $DOTFILES_HOME_FILE
          fi
 
-         f="$DOTFILES_HOME/.my-functions"
-         if [ -f "$f" ]
-         then
-            source "$f" && dotstart_install
-         fi
+         dotstart_install
 
          f="$DOTFILES_HOME/.dotfiles/machines"
          if [ -f "$f" ]
          then
-            MACHINES=`cat $f | tr '\n' ' '`
+            MACHINES=`cat "$f" | tr '\n' ' '`
          fi
       fi
 
       if [ ! "$DOTFILES_HOME" ]
       then
-         echo "You must configure DOTFILES_HOME to use this script! Nothing to do!"
+         echo "DOTFILES_HOME variable must be configured to use this script! Nothing to do!"
          exit 1
       fi
 
@@ -153,6 +195,7 @@ case $OP in
 
       if [ "$OP" = "remove" ]
       then
+         dotstart_uninstall
          echo "Files removed! For effect, you need to restart your shell!";
       fi
       ;;
