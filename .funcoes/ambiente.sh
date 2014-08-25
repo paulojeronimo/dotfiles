@@ -33,7 +33,7 @@ carregar_ambiente() {
 # funções úteis para ir a um diretório específico do ambiente
 home() { verifica_var AMBIENTE_HOME; cd "$AMBIENTE_HOME" &> $OUT || falha; }
 backups() { verifica_var BACKUPS_DIR; cd "$BACKUPS_DIR" &> $OUT || falha; }
-configuracoes() { verifica_var CONFIGURACOES_DIR; cd "$CONFIGURACOES_HOME" &> $OUT || falha; }
+configuracoes() { verifica_var CONFIGURACOES_DIR; cd "$CONFIGURACOES_DIR" &> $OUT || falha; }
 documentos() { verifica_var DOCUMENTOS_DIR; cd "$DOCUMENTOS_DIR" &> $OUT || falha; }
 ferramentas() { verifica_var FERRAMENTAS_DIR; cd "$FERRAMENTAS_DIR" &> $OUT || falha; }
 funcoes() { verifica_var FUNCOES_DIR; cd "$FUNCOES_DIR" &> $OUT || falha; }
