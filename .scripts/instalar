@@ -66,8 +66,6 @@ verifica_opcs() {
             --nao-usa-proxy) unset USA_PROXY;; 
             --usa-root) USA_ROOT=$1;;
             --nao-usa-root) unset USA_ROOT;;
-            --usa-dpkg) USA_DPKG=$1;;
-            --nao-usa-dpkg) unset USA_DPKG;;
             --usa-yum) USA_YUM=$1;;
             --nao-usa-yum) unset USA_YUM;;
             --usa-sudo) SUDO="sudo";;
@@ -95,7 +93,6 @@ verifica_opcs() {
     # Opções default!
     opcs="$opcs ${USA_PROXY:---nao-usa-proxy}"
     opcs="$opcs ${USA_ROOT:---nao-usa-root}"
-    opcs="$opcs ${USA_DPKG:---nao-usa-dpkg}"
     opcs="$opcs ${USA_YUM:---nao-usa-yum}"
     opcs="$opcs ${USA_CURL:---nao-usa-curl}"
     opcs="$opcs ${BAIXA_ARQUIVO:---nao-baixa-arquivo}"
@@ -120,13 +117,13 @@ remove_aplicacao() {
 # Instala uma aplicação no diretório $FERRAMENTAS_DIR
 # Antes disto, faz o download da mesma a partir de uma URL utilizando o baixa_arquivo
 instala_aplicacao() {
+    # se USA_YUM, simplesmente vai embora...
+    [ "$USA_YUM" ] && return
+
     # link (que também é utilizado como nome curto da aplicação) é obrigatório
     verifica_var $APP_LINK
 
-    [ "$TIPO_APP" ] && { 
-        type verifica_opcs_$TIPO_APP &> $OUT && verifica_opcs_$TIPO_APP $INSTALA_OPCS
-        type remove_$TIPO_APP &> $OUT && remove_$TIPO_APP || falha "Função remove_$TIPO_APP não encontrada!" 
-    } || remove_aplicacao
+    _remove
 
     # extrai o conteúdo do instalador
     echo -n "Descompactando ${!APP_INSTALADOR} em ${!APP_DIR}... "
@@ -218,6 +215,14 @@ prepara() {
 instala() {
     prepara "$@"
 
+    # se a instalação é via yum, realiza e vai embora ou dá o erro...
+    [ "$USA_YUM" ] && {
+        echo "Instalando via yum ..."
+        $SUDO yum -y install "${!APP_INSTALADOR}" || falha "Erro na execução do yum!"
+        _instala
+        return $?
+    }
+
     # recupera os instaladores, caso possível
     recuperar_instaladores
 
@@ -228,8 +233,8 @@ instala() {
     # verifica se informou o instalador
     verifica_var $APP_INSTALADOR
 
-    # se não é uma instalação via dpkg ou yum, $APP_DIR é obrigatório
-    [ "$USA_DPKG" -o "$USA_YUM" ] || verifica_var $APP_DIR
+    # verifica se informou o diretório de instalação
+    verifica_var $APP_DIR
 
     # baixa o instalador, caso necessário
     if [ "$BAIXA_ARQUIVO" ]; then
@@ -245,18 +250,6 @@ instala() {
         fi
     fi
 
-    # se a instalação é via dpkg, realiza e vai embora ou dá o erro...
-    [ "$USA_DPKG" ] && {
-        echo -n "Utilizando o dpkg... "
-        dpkg -i "$INSTALADORES_DIR/${!APP_INSTALADOR}" &> $OUT && { ok; return $?; } || falha
-    }
-
-    # se a instalação é via yum, realiza e vai embora ou dá o erro...
-    [ "$USA_YUM" ] && {
-        echo "Instalando via yum ..."
-        $SUDO yum -y install "${!APP_INSTALADOR}" && return $? || falha "Erro na execução do yum!"
-    }
-
     # se foi especificado um usuário para rodar a aplicação, cria-o caso ele não exista
     [ "${!APP_USUARIO}" ] && {
         grep -w "^${!APP_USUARIO}" /etc/passwd &> /dev/null || {
@@ -264,34 +257,34 @@ instala() {
             useradd -m -s /bin/false ${!APP_USUARIO} &> $OUT && ok || falha
         }
     }
-
-    # se o tipo da aplicação foi informada, utiliza uma função própria para o tipo
-    # caso contrário, utiliza o instala_aplicacao
-    [ "$TIPO_APP" ] && { 
-        type verifica_opcs_$TIPO_APP &> $OUT && verifica_opcs_$TIPO_APP $INSTALA_OPCS
-        type instala_$TIPO_APP &> $OUT && instala_$TIPO_APP || falha "Função instala_$TIPO_APP não encontrada!" 
-    } || instala_aplicacao
+    _instala
 }
 
 # Função utilizada na remoção de uma aplicação
 remove() {
     prepara "$@"
 
-    [ "$USA_DPKG" ] && {
-        echo -n "Utilizando o dpkg... "
-        verifica_var $APP_PACOTE
-        dpkg -r ${!APP_PACOTE} &> $OUT && { ok; return $?; } || falha
-    }
-
     [ "$USA_YUM" ] && {
         echo "Removendo via yum ..."
-        $SUDO yum -y remove ${!APP_INSTALADOR} && return $? || falha "Erro na execução do yum!"
+        _remove
+        $SUDO yum -y remove ${!APP_INSTALADOR} || falha "Erro na execução do yum!"
+        return $?
     }
 
     verifica_var FERRAMENTAS_DIR
     verifica_var $APP_DIR
     verifica_var $APP_LINK
+    _remove
+}
 
+_instala() {
+    [ "$TIPO_APP" ] && { 
+        type verifica_opcs_$TIPO_APP &> $OUT && verifica_opcs_$TIPO_APP $INSTALA_OPCS
+        type instala_$TIPO_APP &> $OUT && instala_$TIPO_APP || falha "Função instala_$TIPO_APP não encontrada!" 
+    } || instala_aplicacao
+}
+
+_remove() {
     [ "$TIPO_APP" ] && { 
         type verifica_opcs_$TIPO_APP &> $OUT && verifica_opcs_$TIPO_APP $INSTALA_OPCS
         type remove_$TIPO_APP &> $OUT && remove_$TIPO_APP || falha "Função remove_$TIPO_APP não encontrada!" 
