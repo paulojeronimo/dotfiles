@@ -262,3 +262,14 @@ findf() {
 grepf() {
    find . -type f -print0 | xargs -0 egrep "$@"
 }
+
+# Procura por uma string em arquivos java e correlatos
+grepj() {
+   find . -type f \( \
+      -name '*.java' \
+      -o -name '*.jsp' \
+      -o -name '*.html' \
+      -o -name '*.xhtml' \
+      -o -name '*.properties' \
+      \) -print0 | xargs -0 egrep "$@"
+}
