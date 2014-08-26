@@ -255,7 +255,7 @@ xml_format() {
 # Procura por um arquivo que contenha o nome especificado (expressão regular)
 #   no diretório atual e abaixo
 findf() {
-   find . -type f -print0 | egrep "$@"
+   find . -type f | egrep "$@"
 }
 
 # Procura por uma string (expressão regular), dentro de um arquivo no diretório atual e abaixo
