@@ -32,19 +32,50 @@ carregar_arquivo() {
 
 # Carrega variáveis e/ou funções nos arquivos *.sh de diretórios específicos
 carregar_arquivos_em() {
-   local diretorios="$@"
+   local diretorios
    local d
    local f
+   local ignorado
+   local ignorados
+
+   while [ "$1" ]
+   do
+      case "$1" in
+         -i)
+            f="$2";
+            [ "$f" ] || falha "O arquivo a ser ignorado não foi informado!"
+            ignorados+="$f "
+            shift 2
+            ;;
+         *)
+            diretorios+="$1 "
+            shift
+            ;;
+      esac
+   done
 
    for d in $diretorios
    do
       if [ -d "$d" ]
       then
          shopt -s nullglob
-         for f in "$d"/*.sh; do carregar_arquivo "$f"; done
+         for f in "$d"/*.sh
+         do
+            ignorado=false
+            for i in $ignorados
+            do
+               if [ "`basename $f`" = "$i" ]
+               then
+                  $VERBOSO && echo "ignorando o arquivo \"$f\""
+                  ignorado=true
+                  break
+               fi
+            done
+            $ignorado || carregar_arquivo "$f"
+         done
          shopt -u nullglob
       else
-         $VERBOSO && falha "\"$d\" não é um diretório válido!" || true
+         $VERBOSO && echo "o diretório \"$d\" não existe!" || true
       fi
    done
 }

@@ -2,7 +2,7 @@
 " File ~/.vimrc (Vim configurations) in pj@pj-macbookpro
 
 set expandtab
-set tabstop=3
-set shiftwidth=3
+set tabstop=4
+set shiftwidth=4
 set number
 syntax on

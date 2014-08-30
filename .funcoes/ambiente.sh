@@ -24,10 +24,7 @@ carregar_ambiente() {
    $VERBOSO && echo "ambiente...........: \"$AMBIENTE_HOME\""
    $VERBOSO && echo "sistema operacional: `uname`"
 
-   shopt -s nullglob
-   for f in "$CONFIGURACOES_DIR"{,/`uname`}/*.sh; do carregar_arquivo "$f"; done
-   for f in "$FUNCOES_DIR"{,/`uname`}/*.sh; do carregar_arquivo "$f"; done
-   shopt -u nullglob
+   carregar_arquivos_em {"$CONFIGURACOES_DIR","$FUNCOES_DIR"}{,/`uname`}
 }
 
 # funções úteis para ir a um diretório específico do ambiente
