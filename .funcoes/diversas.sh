@@ -304,3 +304,9 @@ grepj() {
       -o -name '*.properties' \
       \) -print0 | xargs -0 egrep "$@"
 }
+
+# Apresenta a saída do tree, por default, em modo ascii
+# Geralmente, preciso que esta saída seja nesse formato para inserí-la nos meus documentos
+tree() {
+    `which tree` --charset=ascii "$@"
+}
