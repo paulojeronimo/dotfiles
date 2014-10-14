@@ -3,9 +3,6 @@
 #
 # Funções diversas e específicas ao ambiente ao ambiente do OS X
 
-# change a file with 'sed -i'
-sed_i() { sed -i "" "$@"; }
-
 # show/hidde files on OS X
 showHiddenFiles() {
    local op=`echo -n ${1:-true} | tr '[:lower:]' '[:upper:]'`

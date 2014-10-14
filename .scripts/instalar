@@ -50,7 +50,7 @@ baixa_arquivo() {
         [ "$USA_PROXY" ] || { unset http_proxy; no_proxy=--no-proxy; }
 
         if [ "$USA_CURL" ]; then
-            curl -o "$INSTALADORES_DIR/$arquivo" "$url" &> $OUT
+            curl -sSL -C - -o "$INSTALADORES_DIR/$arquivo" "$url" &> $OUT
         else
             wget $no_proxy -O "$INSTALADORES_DIR/$arquivo" -c "$url" &> $OUT
         fi

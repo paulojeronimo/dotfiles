@@ -10,78 +10,86 @@ ok() { echo "ok!"; }
 #   Exibe o status de erro do último comando e imprime o conteúdo do arquivo $OUT 
 #   Utiliza as variáveis globais $OUT e $SAI_EM_FALHA:
 falha() {
-    local status=$?
-    local msg="$1"
+  local status=$?
+  local msg="$1"
 
-    [ "$msg" ] && echo "falhou! Motivo: $msg" | tee "$OUT" || {
-        echo -e "falhou!\nCódigo do erro: $status. Saída do último comando:"
-        cat "$OUT"
-    }
-    $SAI_EM_FALHA && exit $status || return $status
+  [ "$msg" ] && echo "falhou! Motivo: $msg" | tee "$OUT" || {
+    echo -e "falhou!\nCódigo do erro: $status. Saída do último comando:"
+    cat "$OUT"
+  }
+  $SAI_EM_FALHA && exit $status || return $status
 }
 
 # Carrega variáveis e/ou funções no shell corrente
 carregar_arquivo() {
-   local f=$1
-   local ok
+  local f=$1
+  local ok
 
-   $VERBOSO && echo -n "carregando o arquivo \"$f\" ... "
-   $VERBOSO && { source "$f" &> "$OUT" && ok || falha; } || source "$f"
+  $VERBOSO && echo -n "carregando o arquivo \"$f\" ... "
+  $VERBOSO && { source "$f" &> "$OUT" && ok || falha; } || source "$f"
 }
 
 
 # Carrega variáveis e/ou funções nos arquivos *.sh de diretórios específicos
 carregar_arquivos_em() {
-   local diretorios
-   local d
-   local f
-   local ignorado
-   local ignorados
+  local diretorios
+  local d
+  local f
+  local ignorado
+  local ignorados
 
-   while [ "$1" ]
-   do
-      case "$1" in
-         -i)
-            f="$2";
-            [ "$f" ] || falha "O arquivo a ser ignorado não foi informado!"
-            ignorados+="$f "
-            shift 2
-            ;;
-         *)
-            diretorios+="$1 "
-            shift
-            ;;
-      esac
-   done
+  while [ "$1" ]
+  do
+    case "$1" in
+      -i)
+        f="$2";
+        [ "$f" ] || falha "O arquivo a ser ignorado não foi informado!"
+        ignorados+="$f "
+        shift 2
+        ;;
+      *)
+        diretorios+="$1 "
+        shift
+        ;;
+    esac
+  done
 
-   for d in $diretorios
-   do
-      if [ -d "$d" ]
-      then
-         shopt -s nullglob
-         for f in "$d"/*.sh
-         do
-            ignorado=false
-            for i in $ignorados
-            do
-               if [ "`basename $f`" = "$i" ]
-               then
-                  $VERBOSO && echo "ignorando o arquivo \"$f\""
-                  ignorado=true
-                  break
-               fi
-            done
-            $ignorado || carregar_arquivo "$f"
-         done
-         shopt -u nullglob
-      else
-         $VERBOSO && echo "o diretório \"$d\" não existe!" || true
-      fi
-   done
+  for d in $diretorios
+  do
+    if [ -d "$d" ]
+    then
+      shopt -s nullglob
+      for f in "$d"/*.sh
+      do
+        ignorado=false
+        for i in $ignorados
+        do
+          if [ "`basename $f`" = "$i" ]
+          then
+            $VERBOSO && echo "ignorando o arquivo \"$f\""
+            ignorado=true
+            break
+          fi
+        done
+        $ignorado || carregar_arquivo "$f"
+      done
+      shopt -u nullglob
+    else
+      $VERBOSO && echo "o diretório \"$d\" não existe!" || true
+    fi
+  done
 }
 
 # Show PATH, one per line
 showpath() { echo $PATH | tr : '\n'; }
+
+# change a file with 'sed -i'
+sed_i() { 
+  case `uname` in
+    Linux) sed -i "$@";;
+    Darwin) sed -i '' "$@";;
+  esac
+}
 
 # Change the loaded environment configured at this file
 setenv() {
@@ -97,98 +105,98 @@ setenv() {
 
 # Testa se o usuário que está executando esta função é root e falha, caso não seja
 verifica_root() {
-    echo -n "Verificando se o usuário é root... "
-    [ "`id -u`" -eq 0 ] && ok || falha "Este script deve ser rodado como root!"
+  echo -n "Verificando se o usuário é root... "
+  [ "`id -u`" -eq 0 ] && ok || falha "Este script deve ser rodado como root!"
 }
 
 # Extrai o conteúdo de um arquivo, baseado na sua extensão
 extrai() {
-    local file="$1"
-    local cmd
+  local file="$1"
+  local cmd
 
-    [ -r "$file" -o -h "$file" ] && {
-        case "$file" in
-            *.tar.bz2)   cmd="tar xvjf";;
-            *.tar.gz)    cmd="tar xvzf";;
-            *.bz2)       cmd="bunzip";;
-            *.rar)       cmd="unrar x";;
-            *.gz)        cmd="gunzip";;
-            *.tar)       cmd="tar xvf";;
-            *.tbz2)      cmd="tar xvjf";;
-            *.tgz)       cmd="tar xvzf";;
-            *.zip)       cmd="unzip";;
-            *.Z)         cmd="uncompress";;
-            *.7z)        cmd="7z x";;
-            *)           echo "'$1' não pode ser extraido através do extrai!"; return 1;;
-        esac
-    } || { echo "'$1' não é um arquivo válido"; return 1; }
-    $cmd "$file"
+  [ -r "$file" -o -h "$file" ] && {
+      case "$file" in
+          *.tar.bz2)   cmd="tar xvjf";;
+          *.tar.gz)    cmd="tar xvzf";;
+          *.bz2)       cmd="bunzip";;
+          *.rar)       cmd="unrar x";;
+          *.gz)        cmd="gunzip";;
+          *.tar)       cmd="tar xvf";;
+          *.tbz2)      cmd="tar xvjf";;
+          *.tgz)       cmd="tar xvzf";;
+          *.zip)       cmd="unzip";;
+          *.Z)         cmd="uncompress";;
+          *.7z)        cmd="7z x";;
+          *)           echo "'$1' não pode ser extraido através do extrai!"; return 1;;
+      esac
+  } || { echo "'$1' não é um arquivo válido"; return 1; }
+  $cmd "$file"
 }
 
 # Verifica se uma variável está definida
 #   falha caso não esteja definida
 verifica_var() {
-    local nome_var=$1; shift
-    local var=${!nome_var}
+  local nome_var=$1; shift
+  local var=${!nome_var}
 
-    [ "$var" ] || falha "A variável $nome_var não está configurada!"
+  [ "$var" ] || falha "A variável $nome_var não está configurada!"
 
-    case "$1" in
-        --echo) echo -n "$var"
-    esac
+  case "$1" in
+      --echo) echo -n "$var"
+  esac
 }
 
 # Verifica se o diretório apontado pela variável passada existe
 #   falha caso não exista
 verifica_dir() {
-    local dir=`verifica_var $1 --echo` || falha
+  local dir=`verifica_var $1 --echo` || falha
 
-    [ -d $dir ] || falha "O diretório $dir não existe!"
+  [ -d $dir ] || falha "O diretório $dir não existe!"
 }
 
 # Verifica se o diretório informado pelo nome da variável
 #   passada como parâmetro existe. Se não existir, cria-o.
 cria_dir() {
-    local dir=`verifica_var $1 --echo` || falha
+  local dir=`verifica_var $1 --echo` || falha
 
-    [ ! -d "$dir" ] && {
-        echo -n "Criando o diretório $dir... " 
-        mkdir -p "$dir" &> "$OUT" && ok || falha
-    } || true
+  [ ! -d "$dir" ] && {
+      echo -n "Criando o diretório $dir... " 
+      mkdir -p "$dir" &> "$OUT" && ok || falha
+  } || true
 }
 
 # Expande um arquivo zipado criando um diretório com o mesmo nome
 # Útil para realizar tarefas em pacotes J2EE no JBoss
 expande() {
-    local arquivo=$1
+  local arquivo=$1
 
-    [ -f $arquivo ] || { echo $arquivo inexistente!; return 1; }
-    local dir=`dirname "$arquivo"`
-    [ -w $dir ] || { echo sem permissão de escrita no diretório $dir!; return 1; }
-    unzip -d $arquivo.tmp $arquivo > /dev/null
-    mv $arquivo $arquivo.old
-    mv $arquivo.tmp $arquivo
-    rm $arquivo.old
+  [ -f $arquivo ] || { echo $arquivo inexistente!; return 1; }
+  local dir=`dirname "$arquivo"`
+  [ -w $dir ] || { echo sem permissão de escrita no diretório $dir!; return 1; }
+  unzip -d $arquivo.tmp $arquivo > /dev/null
+  mv $arquivo $arquivo.old
+  mv $arquivo.tmp $arquivo
+  rm $arquivo.old
 }
 
 # Comprime um diretório, criando um arquivo de mesmo nome
 # Útil para realizar tarefas em pacotes J2EE no JBoss
 comprime() {
-    local dir=$1
+  local dir=$1
 
-    [ -d $dir ] || { echo $dir inexistente!; return 1; }
-    local basename=`basename "$dir"`
-    local dirpai=`dirname "$dir"`
-    [ -w $dirpai ] || { echo sem permissão de escrita em $dirpai; return 1; }
-    (cd $dir; zip -r ../$basename.tmp *) &> /dev/null
-    rm -rf $dir
-    (cd $dirpai; mv $basename.tmp $basename)
+  [ -d $dir ] || { echo $dir inexistente!; return 1; }
+  local basename=`basename "$dir"`
+  local dirpai=`dirname "$dir"`
+  [ -w $dirpai ] || { echo sem permissão de escrita em $dirpai; return 1; }
+  (cd $dir; zip -r ../$basename.tmp *) &> /dev/null
+  rm -rf $dir
+  (cd $dirpai; mv $basename.tmp $basename)
 }
 
 # Retorna true se o caminho passado é absoluto, false caso contrário
 absoluto() {
-    local path=$1
-    [ ${path:0:1} == '/' ] && true || false
+  local path=$1
+  [ ${path:0:1} == '/' ] && true || false
 }
 
 linka() {
@@ -286,27 +294,29 @@ xml_format() {
 # Procura por um arquivo que contenha o nome especificado (expressão regular)
 #   no diretório atual e abaixo
 findf() {
-   find . -type f | egrep "$@"
+  find . -type f | egrep "$@"
 }
 
 # Procura por uma string (expressão regular), dentro de um arquivo no diretório atual e abaixo
 grepf() {
-   find . -type f -print0 | xargs -0 egrep "$@"
+  find . -type f -print0 | xargs -0 egrep "$@"
 }
 
 # Procura por uma string em arquivos java e correlatos
 grepj() {
-   find . -type f \( \
-      -name '*.java' \
-      -o -name '*.jsp' \
-      -o -name '*.html' \
-      -o -name '*.xhtml' \
-      -o -name '*.properties' \
-      \) -print0 | xargs -0 egrep "$@"
+  find . -type f \( \
+    -name '*.java' \
+    -o -name '*.jsp' \
+    -o -name '*.html' \
+    -o -name '*.xhtml' \
+    -o -name '*.properties' \
+    \) -print0 | xargs -0 egrep "$@"
 }
 
 # Apresenta a saída do tree, por default, em modo ascii
 # Geralmente, preciso que esta saída seja nesse formato para inserí-la nos meus documentos
 tree() {
-    `which tree` --charset=ascii "$@"
+  `which tree` --charset=ascii "$@"
 }
+
+# vim: set tabstop=2 shiftwidth=2 expandtab:
