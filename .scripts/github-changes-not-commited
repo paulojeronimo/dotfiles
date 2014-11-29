@@ -1,0 +1,26 @@
+#!/bin/bash
+# Author: Paulo Jeronimo (paulojeronimo@gmail.com)
+set +x
+
+GITHUB_PROJECTS_HOME=${GITHUB_PROJECTS_HOME:-~/My\ Projects/github.com}
+ERROR_LOG=/tmp/$(basename $0).$$
+
+echo "Searching changes not yet commited on \"$GITHUB_PROJECTS_HOME\":"
+cd "$GITHUB_PROJECTS_HOME"
+
+for d in `find . -maxdepth 1 -type d ! -name '.'`
+do
+    d=`basename $d`
+    pushd "$d" &> /dev/null
+    changes=$(git status -s) 2> $ERROR_LOG || {
+        echo "'git status -s' output an error for \"$d\":"
+        cat $ERROR_LOG
+    }
+    [ "$changes" ] && {
+        echo -e "At \"$d\":"
+        echo -e "$changes\n"
+    }
+    popd &> /dev/null
+done
+
+# vim: set ts=4 sw=4 expandtab:
