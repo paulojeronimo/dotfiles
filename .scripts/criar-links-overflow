@@ -1,0 +1,17 @@
+#!/bin/bash
+# Author: Paulo Jeronimo (email: paulojeronimo@gmail.com; twitter: @paulojeronimo)
+set +x
+
+OVERFLOW_DIR=${OVERFLOW_DIR:-"/HD Externo/pj/overflow"}
+
+cd "$OVERFLOW_DIR" || exit $?
+
+find . -maxdepth 1 -type d ! -name . | while read d
+do
+  d=`basename "$d"`
+  cd ~/"$d" &> /dev/null && \
+      ln -sf "$OVERFLOW_DIR/$d" "HD Externo" || \
+      echo "Diretório \"~/$d\" inexistente."
+done
+
+# vim: set ts=2 sw=2 expandtab:

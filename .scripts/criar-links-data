@@ -1,0 +1,64 @@
+#!/bin/bash
+# Author: Paulo Jeronimo (email: paulojeronimo@gmail.com; twitter: @paulojeronimo)
+#
+# Builds symbolic links in $HOME to my existing files in /data/$MY_USER
+
+MY_USER=${MY_USER:-pj}
+
+# Check /data existance
+case `uname` in
+  Darwin) 
+    if ! [ -L "/data" ]
+    then
+        [ -d /Volumes/data ] || { echo "/Volumes/data does'nt exists!"; exit 1; }
+        sudo ln -s /Volumes/data /data
+    fi
+    ;;
+  Linux)
+    if ! [ -d /data ]
+    then
+        echo "/data does'nt exists!"; exit 1
+    fi
+    ;;
+esac
+
+# Check /data/$MY_USER existance. I expect that it alrealdy exists!
+if ! [ -d /data/$MY_USER ]
+then
+  echo "WARN: \"/data/$MY_USER\" does'nt exists! Creating it!"
+fi
+
+# Go to $HOME dir and find all imediatte files and subdirectories
+cd; find . -maxdepth 1 ! -name . | while read d
+do
+  d=`basename "$d"`
+  
+  # if /data/$MY_USER/$d is a directory recreate $HOME/$d as link to it
+  if [ -d "/data/$MY_USER/$d" ]
+  then
+    sudo rm -rf "$d"
+    ln -s "/data/$MY_USER/$d"
+  fi
+
+  case `uname` in
+    Linux)
+      # On Linux, $HOME/Videos will be linked to /data/$MY_USER/Movies
+      if [ "$d" = "Videos" ]
+      then
+        rm -rf $d
+        ln -s /data/$MY_USER/Movies Videos
+      fi
+      ;;
+  esac
+done
+
+# Go to /data/$MY_USER dir and find all immediate files and subdirectories
+cd /data/$MY_USER; find . -maxdepth 1 ! -name . | while read d
+do
+  d=`basename "$d"`
+
+  # if $HOME/$d does'nt exists, create it as link to /data/$MY_USER/$d
+  [ -L ~/"$d" ] || ln -s "/data/$MY_USER/$d" ~/"$d"
+done
+
+# vim: set ts=2 sw=2 expandtab:

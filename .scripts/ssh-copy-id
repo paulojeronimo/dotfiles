@@ -1,6 +1,13 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 
+case `uname` in
+  Linux) 
+    BIN=/usr/bin/ssh-copy-id
+    [ -x $BIN ] && { $BIN "$@"; exit $?; }
+    ;;
+esac
+
 KEY="$HOME/.ssh/id_rsa.pub"
 SSH_PARAMS=$@
 
@@ -12,3 +19,5 @@ cat $KEY | ssh $SSH_PARAMS '
    mkdir -p $d; chmod 700 $d
    cat - >> $f; chmod 640 $f
 '
+
+# vim: set ts=2 sw=2 expandtab:

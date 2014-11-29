@@ -1,3 +1,0 @@
-#!/bin/bash
-
-sudo rsync -av --update --delete /data/pj/ /PJ-HFS/pj-osx/data/pj/

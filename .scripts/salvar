@@ -1,0 +1,24 @@
+#!/bin/bash
+# Author: Paulo Jeronimo (email: paulojeronimo@gmail.com; twitter: @paulojeronimo)
+set +x
+
+DATA_DIR=${DATA_DIR:-/data/pj}
+BACKUP_DIR=${BACKUP_DIR:-"/HD Externo/pj/data"}
+
+_salvar() {
+  sudo rsync -av --update --delete "$DATA_DIR"/ "$BACKUP_DIR"/
+}
+
+_restaurar() {
+  sudo rsync -av "$BACKUP_DIR"/ "$DATA_DIR"/
+}
+
+script=`basename "$0"`
+case "$script" in
+  salvar|restaurar) :;;
+  *) exit 1;;
+esac
+
+_$script
+
+# vim: set ts=2 sw=2 expandtab:
