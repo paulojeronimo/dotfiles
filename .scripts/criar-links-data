@@ -10,14 +10,17 @@ case `uname` in
   Darwin) 
     if ! [ -L "/data" ]
     then
+      if ! [ -d "/data" ]
+      then
         [ -d /Volumes/data ] || { echo "/Volumes/data does'nt exists!"; exit 1; }
         sudo ln -s /Volumes/data /data
+      fi
     fi
     ;;
   Linux)
     if ! [ -d /data ]
     then
-        echo "/data does'nt exists!"; exit 1
+      echo "/data does'nt exists!"; exit 1
     fi
     ;;
 esac
