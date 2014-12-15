@@ -36,3 +36,7 @@ disableDotDS_Store() {
 
    defaults write com.apple.desktopservices DSDontWriteNetworkStores $op
 }
+
+brew_install() {
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+}

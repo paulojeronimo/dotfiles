@@ -1,0 +1,29 @@
+#!/bin/bash
+# Author: Paulo Jeronimo (paulojeronimo@gmail.com)
+
+script=/tmp/dotfiles-diff.$$
+od=${od:-~/Projects/github.com/pensandoodireito/sislegis-dotfiles}
+vimdiff=${vimdiff:-false}
+
+cat > $script <<EOF
+#/bin/bash
+
+if [ -f "$od/\$1" ]
+then
+    if [ "\$(diff "\$1" "$od/\$1")" ] 
+    then
+        echo "Arquivo \$1 diverge!"
+        $vimdiff && vim -d "\$1" "$od/\$1"
+    else
+        echo "Arquivo \$1 confere!"
+    fi
+else
+    echo "Arquivo \$1 não existe no destino!"
+fi
+EOF
+
+chmod +x $script
+
+echo -e "Comparando arquivos ...\norigem: \"$DOTFILES_HOME\"\ndestino: \"$od\""
+cd "$DOTFILES_HOME"
+find . -type f ! \( -name . -o -path './.git/*' \) -exec $script {} \;

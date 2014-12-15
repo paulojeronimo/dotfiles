@@ -316,7 +316,19 @@ grepj() {
 # Apresenta a saída do tree, por default, em modo ascii
 # Geralmente, preciso que esta saída seja nesse formato para inserí-la nos meus documentos
 tree() {
-  `which tree` --charset=ascii "$@"
+  which tree &> /dev/null && `which tree` --charset=ascii "$@" || {
+    echo 'tree is not installed!'
+  }
+}
+
+# Informa o nome da distribuição Linux que está sendo executada
+distro() {
+  echo $(lsb_release -i | awk -F: '{print $2}')
+}
+
+# Vai para o diretório do projeto dotfiles
+dotfiles() {
+  cd "$DOTFILES_HOME"
 }
 
 # vim: set tabstop=2 shiftwidth=2 expandtab:

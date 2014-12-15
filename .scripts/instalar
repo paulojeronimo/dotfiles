@@ -149,7 +149,8 @@ instala_aplicacao() {
 # montando as variáveis da aplicação, verificando opções e pré-condições
 prepara() {
     # monta as variáveis da aplicação
-    APP=$(echo "$1" | tr [:lower:] [:upper:]); shift
+    APP=$(echo "$1" | tr [:lower:] [:upper:])
+    APP_LOWER=$(echo "$1" | tr [:upper:] [:lower:]); shift
     APP_USUARIO=${APP}_USUARIO
     APP_INSTALADOR=${APP}_INSTALADOR
     APP_INSTALADOR_URL=${APP}_INSTALADOR_URL
@@ -179,6 +180,11 @@ prepara() {
 
     # agrega as opções default, as opções da própria aplicação
     INSTALA_OPCS=`echo $INSTALA_OPCS ${!APP_INSTALA_OPCS} "$@"`
+
+    # se existe o script $APP_LOWER.sh no diretório $FUNCOES_DIR/instalar
+    # soma a opção "--tipo $APP_LOWER" ao INSTALA_OPCS
+    [ -f "$FUNCOES_DIR/instalar/${APP_LOWER}.sh" ] && 
+        INSTALA_OPCS="$INSTALA_OPCS --tipo $APP_LOWER"
 
     # verifica as opções passadas
     verifica_opcs $INSTALA_OPCS
@@ -309,3 +315,5 @@ esac
 
 [ "$app" ] || falha "Applicação não informada!"
 $op $app "$@"
+
+# vim: set ts=4 sw=4 expandtab:

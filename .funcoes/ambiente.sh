@@ -4,17 +4,23 @@
 # Funções auxiliares para a montagem e uso de um ambiente
 
 # Exporta as variáveis default para o ambiente
-export_ambiente_default_dirs() {
-   export BACKUPS_DIR=$AMBIENTE_HOME/backups
-   export CONFIGURACOES_DIR=$AMBIENTE_HOME/configuracoes
-   export DOCUMENTOS_DIR=$AMBIENTE_HOME/documentos
-   export FERRAMENTAS_DIR=$AMBIENTE_HOME/ferramentas
-   export FUNCOES_DIR=$AMBIENTE_HOME/funcoes
-   export INSTALADORES_DIR=$AMBIENTE_HOME/instaladores
-   export PROJETOS_DIR=$AMBIENTE_HOME/projetos
-   export SCRIPTS_DIR=$AMBIENTE_HOME/scripts
+configurar_ambiente() {
+   source "$AMBIENTE_HOME"/ambiente.config &> /dev/null
+
+   # diretórios default
+   export BACKUPS_DIR=${BACKUPS_DIR:-$AMBIENTE_HOME/backups}
+   export CONFIGURACOES_DIR=${CONFIGURACOES_DIR:-$AMBIENTE_HOME/configuracoes}
+   export DOCUMENTOS_DIR=${DOCUMENTOS_DIR:-$AMBIENTE_HOME/documentos}
+   export FERRAMENTAS_DIR=${FERRAMENTAS_DIR:-$AMBIENTE_HOME/ferramentas}
+   export FUNCOES_DIR=${FUNCOES_DIR:-$AMBIENTE_HOME/funcoes}
+   export INSTALADORES_DIR=${INSTALADORES_DIR:-$AMBIENTE_HOME/instaladores}
+   export PROJETOS_DIR=${PROJETOS_DIR:-$AMBIENTE_HOME/projetos}
+   export SCRIPTS_DIR=${SCRIPTS_DIR:-$AMBIENTE_HOME/scripts}
 
    export PATH=$SCRIPTS_DIR:$PATH
+
+   # opções de instalação
+   INSTALA_OPCS="${INSTALA_OPCS:---baixa-arquivo}"
 }
 
 # Carrega todas as configurações e funções do ambiente
@@ -37,6 +43,7 @@ funcoes() { verifica_var FUNCOES_DIR; cd "$FUNCOES_DIR" &> $OUT || falha; }
 instaladores() { verifica_var INSTALADORES_DIR; cd "$INSTALADORES_DIR" &> $OUT || falha; }
 projetos() { verifica_var PROJETOS_DIR; cd "$PROJETOS_DIR" &> $OUT || falha; }
 scripts() { verifica_var SCRIPTS_DIR; cd "$SCRIPTS_DIR" &> $OUT || falha; }
+ambiente() { home; }
 
 # Remove o cache local de instaladores
 remover_instaladores() { rm -rf "$INSTALADORES_DIR"; }
@@ -80,3 +87,5 @@ salvar_instaladores() {
       popd &> /dev/null
    fi
 }
+
+# vim: set ts=3 sw=3 expandtab:
