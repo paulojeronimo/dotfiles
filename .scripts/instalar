@@ -142,7 +142,7 @@ instala_aplicacao() {
     [ "${!APP_DIR}" != "${!APP_LINK}" ] && {
         echo -n "Criando o link ${!APP_LINK} para ${!APP_DIR}... "
         ln -s ${!APP_DIR} ${!APP_LINK} &> $OUT && ok || falha
-    }
+    } || true
 }
 
 # Função que carrega o ambiente de instalação/remoção de aplicações
@@ -286,7 +286,12 @@ remove() {
 _instala() {
     [ "$TIPO_APP" ] && { 
         type verifica_opcs_$TIPO_APP &> $OUT && verifica_opcs_$TIPO_APP $INSTALA_OPCS
-        type instala_$TIPO_APP &> $OUT && instala_$TIPO_APP || falha "Função instala_$TIPO_APP não encontrada!" 
+        if type instala_$TIPO_APP &> $OUT
+        then 
+            instala_$TIPO_APP || falha "Erro na execução de instala_$TIPO_APP!"
+        else
+            falha "Função instala_$TIPO_APP não encontrada!" 
+        fi
     } || instala_aplicacao
 }
 
