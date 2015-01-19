@@ -321,11 +321,6 @@ tree() {
   }
 }
 
-# Informa o nome da distribuição Linux que está sendo executada
-distro() {
-  echo $(lsb_release -i | awk -F: '{print $2}')
-}
-
 # Vai para o diretório do projeto dotfiles
 dotfiles() {
   cd "$DOTFILES_HOME"

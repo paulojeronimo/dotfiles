@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Informa o nome da distribuição Linux que está sendo executada
+distro() {
+  echo $(lsb_release -i | awk -F: '{print $2}')
+}
+
 # Desabilita regras de firewall no iptables.
 firewall_desabilitar() {
   sudo iptables -F
