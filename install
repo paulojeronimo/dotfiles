@@ -11,7 +11,6 @@ DOTFILES_HOME_FILE=~/.dotfiles/home
 DOTSTART_FILE=~/.`hostname -s`
 DOTSTART_TEMPLATE_FILE=~/.dotfiles/dotstart
 
-
 sed_i() {
    case `uname` in
       Darwin) sed -i "" "$@";;
@@ -170,11 +169,13 @@ if [ "$OP" = "install" ]
 then 
    if [ -f "$DOTSTART_FILE" ]
    then
-      echo "File \"$DOTSTART_FILE\" exists! Using it!"
+      BACKUP="$DOTSTART_FILE".`date "+%Y%m%d-%H%M%S"`
+      echo "File \"$DOTSTART_FILE\" exists! Moving it to \"$BACKUP\"!"
+      mv "$DOTSTART_FILE" "$BACKUP"
    else
       echo "File \"$DOTSTART_FILE\" does not exists! Creating it from \"$DOTSTART_TEMPLATE_FILE\"!"
-      sed "s,DOTSTART_FILE,$DOTSTART_FILE,g" $DOTSTART_TEMPLATE_FILE > $DOTSTART_FILE
    fi
+   sed "s,DOTSTART_FILE,$DOTSTART_FILE,g" $DOTSTART_TEMPLATE_FILE > $DOTSTART_FILE
    echo "Files installed! For effect, you need to restart your shell!"
 else
    dotstart_uninstall

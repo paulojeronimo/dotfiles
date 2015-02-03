@@ -1,8 +1,8 @@
 #!/bin/bash
 # Autor: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
 
-source ~/.configuracoes/diversas.sh || exit 1
 source ~/.funcoes/diversas.sh || exit 1
+source ~/.funcoes/`uname`/diversas.sh || exit 1
 source ~/.funcoes/ambiente.sh || exit 1
 SAI_EM_FALHA=true
 
