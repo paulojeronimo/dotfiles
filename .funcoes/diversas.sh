@@ -105,8 +105,13 @@ setenv() {
   local env=$1
   local DOTSTART_FILE=~/.`hostname -s`
 
+  if ! [[ "$env" = /* ]]; then
+    env="$PWD/$env"
+  fi
+
   if [ -f "$env" -o "$env" == /dev/null ]; then
     sed_i "s,^\(export ENVIRONMENT=\)\(.*\),\1\"$env\",g" $DOTSTART_FILE
+    echo "Changes made at \"$DOTSTART_FILE\". For effect, reopen your shell."
   else
     echo "The file \"$env\" does'nt exists! Nothing was done."
   fi
