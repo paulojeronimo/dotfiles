@@ -8,7 +8,7 @@ OP=`basename "$0"`
 # Dot files (and other dirs/files) included in this repo, excluding some not necessary files.
 DOTFILES='find "$DOTFILES_HOME"/ -maxdepth 1 ! \( -wholename "$DOTFILES_HOME"/ -o -name .git -o -name README.\* -o -name install -o -name remove \)'
 DOTFILES_HOME_FILE=~/.dotfiles/home
-DOTSTART_FILE=~/.`hostname -s`
+DOTSTART_FILE=~/.ambiente
 DOTSTART_TEMPLATE_FILE=~/.dotfiles/dotstart
 
 sed_i() {
@@ -79,29 +79,6 @@ _dotfiles() {
          continue
       fi
 
-      # treat MACHINE dotfiles differently
-      if [ "$MACHINES" ]
-      then
-         local is_machine
-         local m
-
-         is_machine=false
-         for m in $MACHINES
-         do
-            if [ "$f" = ".$m" ]
-            then
-               is_machine=true
-               break
-            fi
-         done
-
-         if $is_machine && [ "$f" != ".`hostname -s`" ]
-         then
-            echo "Skipping $t $f"
-            continue
-         fi
-      fi
-
       $op $f $t
    done
 }
@@ -145,12 +122,6 @@ then
    fi
 
    dotstart_install
-
-   f="$DOTFILES_HOME/.dotfiles/machines"
-   if [ -f "$f" ]
-   then
-      MACHINES=`cat "$f" | tr '\n' ' '`
-   fi
 else
    echo "Removing dotfiles ..."
 fi

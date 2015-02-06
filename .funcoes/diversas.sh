@@ -103,7 +103,7 @@ sed_i() {
 # Change the loaded environment configured at this file
 setenv() {
   local env=$1
-  local DOTSTART_FILE=~/.`hostname -s`
+  local DOTSTART_FILE=~/.ambiente
 
   if ! [[ "$env" = /* ]]; then
     env="$PWD/$env"
