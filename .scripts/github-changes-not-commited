@@ -5,6 +5,11 @@ set +x
 GITHUB_PROJECTS_HOME=${GITHUB_PROJECTS_HOME:-~/My\ Projects/github.com}
 ERROR_LOG=/tmp/$(basename $0).$$
 
+[ -d "$GITHUB_PROJECTS_HOME" ] || {
+    echo "\"$GITHUB_PROJECTS_HOME\" is not a valid directory!"
+    exit 1
+}
+
 echo "Searching changes not yet commited on \"$GITHUB_PROJECTS_HOME\":"
 cd "$GITHUB_PROJECTS_HOME"
 
@@ -12,6 +17,11 @@ for d in `find . -maxdepth 1 -type d ! -name '.'`
 do
     d=`basename $d`
     pushd "$d" &> /dev/null
+    [ -d '.git' ] || {
+        echo "At \"$d\": not a git repository!"
+        popd &> /dev/null
+        continue
+    }
     changes=$(git status -s) 2> $ERROR_LOG || {
         echo "'git status -s' output an error for \"$d\":"
         cat $ERROR_LOG
