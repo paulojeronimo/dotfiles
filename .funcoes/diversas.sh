@@ -41,52 +41,46 @@ carregar_arquivo() {
 
 # Carrega variáveis e/ou funções nos arquivos *.sh de diretórios específicos
 carregar_arquivos_em() {
-  local diretorios
-  local d
-  local f
-  local ignorado
-  local ignorados
-
-  while [ "$1" ]
-  do
-    case "$1" in
-      -i)
-        f="$2";
-        [ "$f" ] || falha "O arquivo a ser ignorado não foi informado!"
-        ignorados+="$f "
-        shift 2
-        ;;
-      *)
-        diretorios+="$1 "
-        shift
-        ;;
-    esac
-  done
-
-  for d in $diretorios
-  do
-    if [ -d "$d" ]
-    then
-      shopt -s nullglob
-      for f in "$d"/*.sh
-      do
-        ignorado=false
-        for i in $ignorados
+    local d
+    local pos=0
+    local ignorados
+    local diretorios
+    for d in "$@"
+    do
+        (( pos++ ))
+        case $d in
+            -i) 
+                [ "$ignorados" ] && ignorados+=","
+                ignorados+=${@:$((pos+1)):1}
+                continue
+                ;;
+            *)
+                [ $(( pos >= 1 )) -a "${@:$((pos-1)):1}" = "-i" ] && continue
+                [ "$diretorios" ] && diretorios+=","
+                diretorios+=$d
+        esac
+    done
+    local OLD_IFS=$IFS
+    IFS=','
+    for d in $diretorios
+    do
+        [ -d "$d" ] || { $VERBOSO && echo "o diretório \"$d\" não existe!"; continue; }
+        shopt -s nullglob
+        local f
+        local ignorado
+        for f in "$d"/*.sh
         do
-          if [ "$f" = "$i" ]
-          then
-            $VERBOSO && echo "ignorando o arquivo \"$f\""
-            ignorado=true
-            break
-          fi
+            ignorado=false
+            local g
+            for g in $ignorados
+            do
+                [ "$f" = "$g" ] && { $VERBOSO && echo "ignorando o arquivo \"$f\" ignorado!"; ignorado=true; break; }
+            done
+            $ignorado || carregar_arquivo "$f"
         done
-        $ignorado || carregar_arquivo "$f"
-      done
-      shopt -u nullglob
-    else
-      $VERBOSO && echo "o diretório \"$d\" não existe!" || true
-    fi
-  done
+        shopt -u nullglob
+    done
+    IFS=$OLD_IFS
 }
 
 # Show PATH, one per line
