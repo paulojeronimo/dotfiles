@@ -3,7 +3,7 @@
 set +x
 
 DATA_DIR=${DATA_DIR:-/data/pj}
-BACKUP_DIR=${BACKUP_DIR:-"/HD Externo/pj/data"}
+BACKUP_DIR=${BACKUP_DIR:-"/HD Externo/data-bkp/pj"}
 
 _salvar() {
   sudo rsync -av --update --delete "$DATA_DIR"/ "$BACKUP_DIR"/

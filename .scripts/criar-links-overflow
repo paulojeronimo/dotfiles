@@ -2,7 +2,7 @@
 # Author: Paulo Jeronimo (email: paulojeronimo@gmail.com; twitter: @paulojeronimo)
 set +x
 
-OVERFLOW_DIR=${OVERFLOW_DIR:-"/HD Externo/pj/overflow"}
+OVERFLOW_DIR=${OVERFLOW_DIR:-"/HD Externo/overflow/pj"}
 
 cd "$OVERFLOW_DIR" || exit $?
 
