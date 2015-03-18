@@ -28,9 +28,9 @@ carregar_ambiente() {
    local f
 
    $VERBOSO && echo "ambiente...........: \"$AMBIENTE_HOME\""
-   $VERBOSO && echo "sistema operacional: `uname`"
+   $VERBOSO && echo "sistema operacional: $PLATAFORMA"
 
-   carregar_arquivos_em {"$CONFIGURACOES_DIR","$FUNCOES_DIR"}{,/`uname`}
+   carregar_arquivos_em {"$CONFIGURACOES_DIR","$FUNCOES_DIR"}{,/$PLATAFORMA}
 }
 
 # funções úteis para ir a um diretório específico do ambiente

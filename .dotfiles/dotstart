@@ -6,7 +6,7 @@
 # Carrega variáveis e funções
 f=~/.dotfiles/home; source ~/.dotfiles/home || return $?
 f=~/.funcoes/diversas.sh; source $f || return $?
-carregar_arquivos_em ~/.{configuracoes,funcoes}{,/`uname`} -i $f
+carregar_arquivos_em ~/.{configuracoes,funcoes}{,/$PLATAFORMA} -i $f
 unset f
 
 # Configura o PATH
