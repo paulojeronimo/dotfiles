@@ -4,6 +4,14 @@ set +x
 
 OVERFLOW_DIR=${OVERFLOW_DIR:-"/HD Externo/overflow/pj"}
 
+if ! [ -L "/HD Externo" ]
+then
+  case `uname` in
+    Linux) sudo ln -s /run/media/$USER "/HD Externo";;
+    Darwin) sudo ln -s /Volumes "/HD Externo";;
+  esac
+fi
+
 cd "$OVERFLOW_DIR" || exit $?
 
 find . -maxdepth 1 -type d ! -name . | while read d

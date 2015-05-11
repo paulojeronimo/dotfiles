@@ -10,7 +10,7 @@ _salvar() {
 }
 
 _restaurar() {
-  sudo rsync -av "$BACKUP_DIR"/ "$DATA_DIR"/
+  sudo rsync -av --update --delete "$BACKUP_DIR"/ "$DATA_DIR"/
 }
 
 script=`basename "$0"`
