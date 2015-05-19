@@ -8,3 +8,4 @@ set shiftwidth=4
 set number
 syntax on
 set modelines=5
+set encoding=utf-8
