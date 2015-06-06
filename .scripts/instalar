@@ -40,19 +40,19 @@ baixa_arquivo() {
     [ "$arquivo" ] || falha "O valor para --arquivo não foi informado!"
 
     if [ ! "$url_completa" ]; then
-        echo -n "Baixando $arquivo de $url... "
+        echo "Baixando $arquivo de $url"
         url="$url/$arquivo" 
     else
-        echo -n "Baixando $url... "
+        echo "Baixando $url"
     fi
 
     (
         [ "$USA_PROXY" ] || { unset http_proxy; no_proxy=--no-proxy; }
 
         if [ "$USA_CURL" ]; then
-            curl -sSL -C - -o "$INSTALADORES_DIR/$arquivo" "$url" &> $OUT
+            curl -sSL -C - -o "$INSTALADORES_DIR/$arquivo" "$url"
         else
-            wget $no_proxy -O "$INSTALADORES_DIR/$arquivo" -c "$url" &> $OUT
+            wget $no_proxy -O "$INSTALADORES_DIR/$arquivo" -c "$url"
         fi
     ) && ok || falha
 }
