@@ -3,6 +3,10 @@
 #
 # Arquivo DOTSTART_FILE (gerado a partir do .dotfiles/dotstart)
 
+# Habilita mais mensagens se configurado para true
+# Configure aqui, ou antes num dos arquivos de inicialização (~/.bashrc, ~/.profile)
+VERBOSO=${VERBOSO:-false}
+
 # Carrega variáveis e funções
 f=~/.dotfiles/home; source ~/.dotfiles/home || return $?
 f=~/.funcoes/diversas.sh; source $f || return $?

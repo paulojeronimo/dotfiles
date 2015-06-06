@@ -4,8 +4,14 @@
 # Funções auxiliares para a montagem e uso de um ambiente
 
 # Exporta as variáveis default para o ambiente
-configurar_ambiente() {
-   source "$AMBIENTE_HOME"/ambiente.config &> /dev/null
+_configurar_ambiente() {
+   local ambiente_config="$AMBIENTE_HOME"/ambiente.config
+
+   if [ -f "$ambiente_config" ]
+   then
+      $VERBOSO && echo "Iniciando configuração do ambiente pelo leitura do arquivo \"$ambiente_config\""
+      source "$ambiente_config"
+   fi
 
    # diretórios default
    export BACKUPS_DIR=${BACKUPS_DIR:-$AMBIENTE_HOME/backups}
@@ -24,12 +30,15 @@ configurar_ambiente() {
 }
 
 # Carrega todas as configurações e funções do ambiente
-carregar_ambiente() {
+_carregar_ambiente() {
+   local ambiente_home="$1"
    local f
 
-   $VERBOSO && echo "ambiente...........: \"$AMBIENTE_HOME\""
-   $VERBOSO && echo "sistema operacional: $PLATAFORMA"
+   export AMBIENTE_HOME="$ambiente_home"
+   $VERBOSO && echo "Ajustando o ambiente para o diretório \"$AMBIENTE_HOME\""
+   $VERBOSO && echo "Plataforma utilizada: $PLATAFORMA"
 
+   _configurar_ambiente
    carregar_arquivos_em {"$CONFIGURACOES_DIR","$FUNCOES_DIR"}{,/$PLATAFORMA}
 }
 
