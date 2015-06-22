@@ -156,6 +156,7 @@ prepara() {
     APP_INSTALADOR_URL=${APP}_INSTALADOR_URL
     APP_INSTALADOR_URL_COMPLETA=${APP}_INSTALADOR_URL_COMPLETA
     APP_INSTALA_OPCS=${APP}_INSTALA_OPCS
+    APP_INSTALA_DIR=${APP}_INSTALA_DIR
     APP_DIR=${APP}_DIR
     APP_LINK=${APP}_LINK
     APP_PACOTE=${APP}_PACOTE
@@ -181,9 +182,13 @@ prepara() {
     # agrega as opções default, as opções da própria aplicação
     INSTALA_OPCS=`echo $INSTALA_OPCS ${!APP_INSTALA_OPCS} "$@"`
 
-    # se existe o script $APP_LOWER.sh no diretório $FUNCOES_DIR/instalar
+    [ "${!APP_INSTALA_DIR}" ] && 
+        local instala_dir="${!APP_INSTALA_DIR}" ||
+        local instala_dir=$FUNCOES_DIR/instalar
+
+    # se existe o script $APP_LOWER.sh no diretório $instala_dir
     # soma a opção "--tipo $APP_LOWER" ao INSTALA_OPCS
-    [ -f "$FUNCOES_DIR/instalar/${APP_LOWER}.sh" ] && 
+    [ -f "$instala_dir/${APP_LOWER}.sh" ] && 
         INSTALA_OPCS="$INSTALA_OPCS --tipo $APP_LOWER"
 
     # verifica as opções passadas
@@ -191,7 +196,7 @@ prepara() {
 
     # carrega o script de instalação para uma aplicação, se o tipo da mesma for informado
     [ "$TIPO_APP" ] && {
-      local nome_script="$FUNCOES_DIR/instalar/$TIPO_APP.sh"
+      local nome_script="$instala_dir/$TIPO_APP.sh"
 
       echo -n "Carregando script $nome_script... "
       source "$nome_script" &> $OUT && ok || falha
