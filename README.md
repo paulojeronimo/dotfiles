@@ -11,3 +11,5 @@ Want remove? Very simple!! ;) Only do this:
 ```bash
 $ ./dotfiles/remove
 ```
+
+TODO: fix symbolic links errors when using Cygwin
