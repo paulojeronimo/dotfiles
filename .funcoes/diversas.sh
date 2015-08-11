@@ -341,4 +341,14 @@ dotfiles() {
   cd "$DOTFILES_HOME"
 }
 
+# Vai para o diretório de downloads
+downloads() {
+  local dir=~/Downloads
+
+  if [ -d "$dir" ]
+  then
+    cd "$dir"
+  fi  
+}
+
 # vim: set tabstop=2 shiftwidth=2 expandtab:
