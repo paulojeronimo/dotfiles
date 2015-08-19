@@ -3,6 +3,7 @@
 # Useful script to operate my dotfiles (files starting with a "." and located at $HOME)
 set +x
 
+BASEDIR=`cd "$(dirname "$0")"; echo -n $PWD`
 OP=`basename "$0"`
 
 # Dot files (and other dirs/files) included in this repo, excluding some not necessary files.
@@ -114,7 +115,7 @@ then
    echo "Installing dotfiles ..."
    if ! [ "$DOTFILES_HOME" ]
    then
-      DOTFILES_HOME=`cd "$(dirname "$0")"; echo -n $PWD`
+      export DOTFILES_HOME=$BASEDIR
 
       ln -s "${DOTFILES_HOME/$HOME\/}/.dotfiles" ~/
       echo "Writing $DOTFILES_HOME_FILE with the following content:"
@@ -148,6 +149,9 @@ then
    fi
    sed "s,DOTSTART_FILE,$DOTSTART_FILE,g" $DOTSTART_TEMPLATE_FILE > $DOTSTART_FILE
    echo "Files installed! For effect, you need to restart your shell!"
+   case $OSTYPE in
+      cygwin) $BASEDIR/.scripts/fixvim;;
+   esac
 else
    dotstart_uninstall
    echo "Files removed! For effect, you need to restart your shell!";

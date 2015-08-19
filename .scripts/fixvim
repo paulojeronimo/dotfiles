@@ -1,0 +1,25 @@
+#!/bin/bash
+
+[[ $OSTYPE = cygwin ]] || exit
+
+backup=`date +%F`
+
+cd
+
+if [ -L .vim ] 
+then
+    rm -f .vim
+else
+    mv .vim .vim.$backup
+fi
+
+if [ -L .vimrc ] 
+then
+    rm -f .vimrc
+else
+    mv .vimrc .vimrc.$backup
+fi
+
+cp -r $DOTFILES_HOME/.vimrc .
+cp -r $DOTFILES_HOME/.vim vimfiles
+ln -s vimfiles .vim
