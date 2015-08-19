@@ -13,6 +13,20 @@ _configurar_ambiente() {
       source "$ambiente_config"
    fi
 
+   # ajustes para execução no Cygwin
+   case $PLATAFORMA in
+       Cygwin)
+           [ "$BACKUPS_DIR" ] && BACKUPS_DIR=`cygpath "$BACKUPS_DIR"`
+           [ "$CONFIGURACOES_DIR" ] && CONFIGURACOES_DIR=`cygpath "$CONFIGURACOES_DIR"`
+           [ "$DOCUMENTOS_DIR" ] && DOCUMENTOS_DIR=`cygpath "$DOCUMENTOS_DIR"`
+           [ "$FERRAMENTAS_DIR" ] && FERRAMENTAS_DIR=`cygpath "$FERRAMENTAS_DIR"`
+           [ "$FUNCOES_DIR" ] && FUNCOES_DIR=`cygpath "$FUNCOES_DIR"`
+           [ "$INSTALADORES_DIR" ] && INSTALADORES_DIR=`cygpath "$INSTALADORES_DIR"`
+           [ "$PROJETOS_DIR" ] && PROJETOS_DIR=`cygpath "$PROJETOS_DIR"`
+           [ "$SCRIPTS_DIR" ] && SCRIPTS_DIR=`cygpath "$SCRIPTS_DIR"`
+           ;;
+   esac
+
    # diretórios default
    export BACKUPS_DIR=${BACKUPS_DIR:-$AMBIENTE_HOME/backups}
    export CONFIGURACOES_DIR=${CONFIGURACOES_DIR:-$AMBIENTE_HOME/configuracoes}
