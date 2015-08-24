@@ -96,8 +96,16 @@ _install() {
       ;;
    esac
 
-   echo "Linking $t $DOTFILES_HOME/$f to ~/$f"
-   ln -s "${DOTFILES_HOME/$HOME\/}/$f" ~/
+   case $OSTYPE in
+      cygwin)
+         echo "Copying $t $DOTFILES_HOME/$f to ~/"
+         cp -r "$DOTFILES_HOME/$f" ~/
+      ;;
+      *)
+         echo "Linking $t $DOTFILES_HOME/$f to ~/$f"
+         ln -s "${DOTFILES_HOME/$HOME\/}/$f" ~/
+      ;;
+   esac
 }
 
 # Remove a file from ~/
@@ -117,7 +125,14 @@ then
    then
       export DOTFILES_HOME=$BASEDIR
 
-      ln -s "${DOTFILES_HOME/$HOME\/}/.dotfiles" ~/
+      case $OSTYPE in
+         cygwin)
+            cp -r "$DOTFILES_HOME"/.dotfiles ~/
+         ;;
+         *) 
+            ln -s "${DOTFILES_HOME/$HOME\/}/.dotfiles" ~/
+         ;;
+      esac
       echo "Writing $DOTFILES_HOME_FILE with the following content:"
       echo "export DOTFILES_HOME=\"$DOTFILES_HOME\"" | tee $DOTFILES_HOME_FILE
    fi
