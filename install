@@ -114,7 +114,14 @@ _remove() {
    local t=$2
    
    echo "Unlinking $t ~/$f"
-   rm -f ~/$f
+   case $OSTYPE in
+		cygwin)
+			rm -rf ~/$f
+		;;
+		*)
+			rm -f ~/$f
+		;;
+   esac
 }
 
 # Processing starts here ...
