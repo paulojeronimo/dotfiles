@@ -2,3 +2,5 @@
 # Autor: Paulo Jerônimo (pj@paulojeronimo, @paulojeronimo)
 #
 # Funções diversas e específicas ao ambiente ao ambiente Cygwin
+
+open() { cmd /C start "$@"; }
