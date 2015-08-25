@@ -171,9 +171,9 @@ then
    fi
    sed "s,DOTSTART_FILE,$DOTSTART_FILE,g" $DOTSTART_TEMPLATE_FILE > $DOTSTART_FILE
    echo "Files installed! For effect, you need to restart your shell!"
-   case $OSTYPE in
-      cygwin) $BASEDIR/.scripts/fixvim;;
-   esac
+   #case $OSTYPE in
+   #   cygwin) $BASEDIR/.scripts/fixvim;;
+   #esac
 else
    dotstart_uninstall
    echo "Files removed! For effect, you need to restart your shell!";
