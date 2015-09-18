@@ -36,6 +36,9 @@ falha() {
   $SAI_EM_FALHA && exit $status || return $status
 }
 
+# Imprime o nome do diretório corrente
+_pwd() { echo -n $(cd "$(dirname "$(caller | cut -d ' ' -f 2-)")"; pwd); }
+
 # Carrega variáveis e/ou funções no shell corrente
 carregar_arquivo() {
   local f=$1
