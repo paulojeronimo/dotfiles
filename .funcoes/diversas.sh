@@ -12,12 +12,13 @@ SAI_EM_FALHA=${SAI_EM_FALHA:-false}
 # OUT é utilizado por várias funções e é um arquivo utilizado para salvar saídas de comandos
 OUT=${OUT:-`d=/tmp/out_${USER}; [ -d $d ] || mkdir -p $d; echo -n $d/$$.log`}
 
-# Verifica a plataforma
+# Verifica e exporta a plataforma
 case "$OSTYPE" in
   linux*) PLATAFORMA=Linux;;
   cygwin) PLATAFORMA=Cygwin;;
   darwin*) PLATAFORMA=Darwin;;
 esac
+export PLATAFORMA
 
 # Imprime "ok"
 ok() { echo "ok!"; }
