@@ -142,9 +142,9 @@ extrai() {
           *.tar)       cmd="tar xvf";;
           *.tbz2)      cmd="tar xvjf";;
           *.tgz)       cmd="tar xvzf";;
-          *.zip)       cmd="unzip";;
+          *.zip)       [[ $PLATAFORMA = Cygwin ]] && cmd="7za x" || cmd="unzip";;
           *.Z)         cmd="uncompress";;
-          *.7z)        cmd="7z x";;
+          *.7z)        cmd="7za x";;
           *)           echo "'$1' não pode ser extraido através do extrai!"; return 1;;
       esac
   } || { echo "'$1' não é um arquivo válido"; return 1; }
