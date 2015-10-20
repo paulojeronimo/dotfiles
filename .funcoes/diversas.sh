@@ -355,4 +355,9 @@ downloads() {
   fi  
 }
 
+# Executa um servidor HTTP simples através do Ruby
+ruby_httpd() {
+  ruby -run -e httpd . -p 5000
+}
+
 # vim: set tabstop=2 shiftwidth=2 expandtab:
