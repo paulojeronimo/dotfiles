@@ -14,6 +14,7 @@ carregar_arquivos_em ~/.{configuracoes,funcoes}{,/$PLATAFORMA} -i $f
 unset f
 
 # Configura o PATH
+[[ $PLATAFORMA = Cygwin ]] && export PATH=~/bin:$PATH
 export PATH=~/.scripts:$PATH
 
 # Ajusta e carrega o ambiente (se ele não for /dev/null)
