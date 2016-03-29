@@ -4,10 +4,10 @@
 set +x
 
 BASEDIR=`cd "$(dirname "$0")"; echo -n $PWD`
-OP=`basename "$0"`
+OP=${OP:-`basename "$0"`}
 
 # Dot files (and other dirs/files) included in this repo, excluding some not necessary files.
-DOTFILES='find "$DOTFILES_HOME"/ -maxdepth 1 ! \( -wholename "$DOTFILES_HOME"/ -o -name .git -o -name README.\* -o -name install -o -name remove \)'
+DOTFILES='find "$DOTFILES_HOME"/ -maxdepth 1 ! \( -wholename "$DOTFILES_HOME"/ -o -name .git -o -name README.\* -o -name install -o -name remove -o -name .gitmodules \)'
 DOTFILES_HOME_FILE=~/.dotfiles/home
 DOTSTART_FILE=~/.ambiente
 DOTSTART_TEMPLATE_FILE=~/.dotfiles/dotstart
