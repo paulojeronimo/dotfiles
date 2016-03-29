@@ -124,6 +124,14 @@ _remove() {
    esac
 }
 
+# Init and update git sumodules
+submodules_init() {
+   pushd "$BASEDIR" &> /dev/null
+   git submodule init
+   git submodule update
+   popd &> /dev/null
+}
+
 # Processing starts here ...
 if [ "$OP" = "install" ]
 then
@@ -132,6 +140,7 @@ then
    then
       export DOTFILES_HOME=$BASEDIR
 
+      submodules_init
       case $OSTYPE in
          cygwin)
             cp -r "$DOTFILES_HOME"/.dotfiles ~/
