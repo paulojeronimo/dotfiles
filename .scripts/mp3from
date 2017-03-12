@@ -1,0 +1,29 @@
+#!/bin/bash
+
+BASE_DIR=`cd $(dirname "$0"); pwd`
+
+_m4a() {
+  for f in *.m4a
+  do
+    dest=mp3/${f%.m4a}.mp3
+    [ -f "$dest" ] && continue
+    ffmpeg "$dest" -i "$f" -c:a libmp3lame -q:a 1
+  done
+}
+
+_mp4() {
+  for f in *.mp4
+  do
+    dest=mp3/${f%.mp4}.mp3
+    [ -f "$dest" ] && continue
+    # http://bit.ly/2mfcSSK
+    ffmpeg -i "$f" -b:a 192K -vn "$dest"
+  done
+}
+
+op=${1:-mp4}
+if type _$op &> /dev/null
+then
+  mkdir -p mp3
+  _$op
+fi
