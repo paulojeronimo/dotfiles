@@ -1,29 +1,45 @@
 #!/bin/bash
+BASE_DIR=`cd "$(dirname "$0")"; pwd`
+DEST_DIR=${DEST_DIR:-../`basename "$PWD"`.mp3}
 
-BASE_DIR=`cd $(dirname "$0"); pwd`
+# http://askubuntu.com/a/344418
+IFS=$'\n'
 
-_m4a() {
-  for f in *.m4a
+_do4() {
+  local t=$1
+
+  echo "Converting *.$t from $PWD to \"$DEST_DIR\" ..."
+  for f in $(find . -type f -name "*.$t")
   do
-    dest=mp3/${f%.m4a}.mp3
-    [ -f "$dest" ] && continue
-    ffmpeg "$dest" -i "$f" -c:a libmp3lame -q:a 1
+    f=${f#*/}
+    dest=$DEST_DIR/${f%.$t}.mp3
+    [ -f "$dest" ] && { echo "Skipping \"$f\" ..."; continue; }
+    echo "Converting \"$f\" ..."
+    mkdir -p "$DEST_DIR/`dirname "$f"`"
+    case "$t" in
+      m4a)
+        ffmpeg -i "$f" -c:a libmp3lame -q:a 1 "$dest" 2> /dev/null
+        ;;
+      mp4)
+        # http://bit.ly/2mfcSSK
+        ffmpeg -i "$f" -b:a 192K -vn "$dest" 2> /dev/null
+        ;;
+    esac
   done
 }
 
+_m4a() {
+  _do4 m4a
+}
+
 _mp4() {
-  for f in *.mp4
-  do
-    dest=mp3/${f%.mp4}.mp3
-    [ -f "$dest" ] && continue
-    # http://bit.ly/2mfcSSK
-    ffmpeg -i "$f" -b:a 192K -vn "$dest"
-  done
+  _do4 mp4
 }
 
 op=${1:-mp4}
 if type _$op &> /dev/null
 then
-  mkdir -p mp3
+  [ -d "$DEST_DIR" ] || echo "Creating \"$DEST_DIR\" ..."
+  mkdir -p "$DEST_DIR"
   _$op
 fi
