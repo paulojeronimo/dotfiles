@@ -1,0 +1,35 @@
+#!/bin/bash
+set +x
+
+# References:
+# http://stackoverflow.com/questions/16090869/how-to-pretty-print-xml-from-the-command-line
+
+input=$1
+output=${2:-$1}
+
+rm-tmp() {
+  if [ "$tmp" ]; then rm -f "$tmp"; fi
+}
+
+fix-input-output() {
+  [ "$input" ] || exit
+  if [ "$input" = "$output" ]
+  then
+    cp "$input" "$input".tmp
+    output="$input"
+    input="$input".tmp
+    tmp="$input"
+    trap rm-tmp EXIT
+  fi
+}
+
+with-xmllint() {
+  xmllint --format
+}
+
+with-tidy() {
+  tidy --wrap 0 --indent yes --indent-spaces 4 --indent-attributes yes --wrap-attributes yes --input-xml yes --output-xml yes
+}
+
+fix-input-output
+with-tidy < $input > $output 2> /dev/null
