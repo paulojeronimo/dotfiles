@@ -334,11 +334,11 @@ grepj() {
 
 # Apresenta a saída do tree, por default, em modo ascii
 # Geralmente, preciso que esta saída seja nesse formato para inserí-la nos meus documentos
-tree() {
-  which tree &> /dev/null && `which tree` --charset=ascii "$@" || {
-    echo 'tree is not installed!'
-  }
-}
+#tree() {
+#  which tree &> /dev/null && `which tree` --charset=ascii "$@" || {
+#    echo 'tree is not installed!'
+#  }
+#}
 
 # Vai para o diretório do projeto dotfiles
 dotfiles() {

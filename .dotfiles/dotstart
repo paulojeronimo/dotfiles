@@ -8,7 +8,7 @@
 VERBOSO=${VERBOSO:-false}
 
 # Carrega variáveis e funções
-f=~/.dotfiles/home; source ~/.dotfiles/home || return $?
+f=~/.dotfiles/home; source $f || return $?
 f=~/.funcoes/diversas.sh; source $f || return $?
 carregar_arquivos_em ~/.{configuracoes,funcoes}{,/$PLATAFORMA} -i $f
 unset f
