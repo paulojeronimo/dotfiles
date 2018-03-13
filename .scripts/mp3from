@@ -1,6 +1,6 @@
 #!/bin/bash
 BASE_DIR=`cd "$(dirname "$0")"; pwd`
-DEST_DIR=${DEST_DIR:-../`basename "$PWD"`.mp3}
+DEST_DIR=${DEST_DIR:-~/Music/from-movies/`basename "$PWD"`}
 
 # http://askubuntu.com/a/344418
 IFS=$'\n'
