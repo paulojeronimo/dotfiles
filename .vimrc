@@ -10,4 +10,4 @@ set shiftwidth=4
 set number
 set modelines=5
 set encoding=utf-8
-colorscheme evening
+"colorscheme evening

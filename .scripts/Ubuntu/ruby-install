@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# This script install RVM as a Single User
+# Also installs Ruby 2.6 and set it default
+
+BASE_DIR=`cd "$(dirname "$0")"; pwd`
+
+# RVM install
+curl -sSL https://rvm.io/mpapis.asc | gpg --import -
+curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
+curl -sSL https://get.rvm.io | bash -s stable
+
+export PATH=$PATH:~/.rvm/bin
+
+# Ruby install
+rvm get stable --auto-dotfiles
+rvm install 2.6
+rvm use 2.6
+rvm alias create default 2.6

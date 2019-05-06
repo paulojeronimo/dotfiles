@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+BASE_DIR=`cd "$(dirname "$0")"; pwd`
+source "$BASE_DIR/config"
+
+source_file "$proxy_file"
+source_file "$docker_file"
+
+# configure proxy
+docker_service_d=/etc/systemd/system/docker.service.d
+sudo mkdir -p $docker_service_d
+sudo cat > $docker_service_d/http-proxy.conf <<EOF
+[Service]
+Environment="HTTP_PROXY=$http_proxy"
+Environment="NO_PROXY=localhost,127.0.0.0/8,$docker_registry_server"
+EOF
+
+# configure docker_registry
+docker_service=/etc/systemd/system/multi-user.targe.wants/docker.service
+cat > /dev/null << TO_BE_FIXED
+sudo sed 's/^(ExecStart.*)/\1 --insecure-registry $docker_registry/g' -i $docker_service
+TO_BE_FIXED
+
+# restart
+sudo systemctl daemon-reload
+sudo systemctl restart docker

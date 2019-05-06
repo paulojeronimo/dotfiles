@@ -15,7 +15,7 @@ unset f
 
 # Configura o PATH
 [[ $PLATAFORMA = Cygwin ]] && export PATH=~/bin:$PATH
-export PATH=~/.scripts:$PATH
+export PATH=~/.scripts:~/.scripts/`distro`:$PATH
 
 # Ajusta e carrega o ambiente (se ele não for /dev/null)
 export ENVIRONMENT=/dev/null
@@ -23,3 +23,11 @@ export ENVIRONMENT=/dev/null
 
 # Apresenta a data e a hora da sessão (se estivermos num login shell)
 shopt -q login_shell && date +"Sessão iniciada em %F às %T"
+
+# Start TMUX (Ref: https://unix.stackexchange.com/a/113768)
+command -v tmux &> /dev/null && \
+    [ -n "$PS1" ] && \
+    [[ ! "$TERM" =~ screen ]] && \
+    [[ ! "$TERM" =~ tmux ]] && \
+    [ -z "$TMUX" ] && \
+    exec tmux

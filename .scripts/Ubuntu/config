@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+settings_dir=~/Company/Settings
+proxy_file=$settings_dir/proxy.sh
+docker_file=$settings_dir/docker.sh
+
+source_file() {
+    source "$1" &> /dev/null || {
+        echo "File \"$1\" could not be read!"
+        return $?
+    }
+}

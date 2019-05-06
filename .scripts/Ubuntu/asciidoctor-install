@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+BASE_DIR=`cd "$(dirname "$0")"; pwd`
+
+gem install asciidoctor
+gem install asciidoctor-pdf --pre

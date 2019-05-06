@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+apt_packages=(
+vim
+tree
+docker.io
+chromium-browser
+maven
+gradle
+nodejs
+npm
+asciidoctor
+lynx
+w3m
+)
+
+snap_packages=(
+"intellij-idea-community --classic"
+"kotlin --classic"
+)
+
+ruby_packages=(
+"asciidoctor-pdf --pre"
+)
+
+apt-packages-install() {
+    sudo apt update
+    sudo apt install -y ${apt_packages[*]}
+}
+
+snap-packages-install() {
+    #cat > /dev/null << TO_BE_FIXED
+    for snap_package in "${snap_packages[@]}"
+    do
+        snap install "$snap_package"
+    done
+    #TO_BE_FIXED
+}
+
+ruby-packages-install() {
+    #cat > /dev/null << TO_BE_FIXED
+    for ruby_package in "${ruby_packages[@]}"
+    do
+        sudo gem install --http-proxy $http_proxy "$ruby_package"
+    done
+    #TO_BE_FIXED
+}
+
+ruby-packages-install

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+BASE_DIR=`cd "$(dirname "$0")"; pwd`
+source "$BASE_DIR/config"
+
+source_file "$proxy_file"
+
+echo "Acquire::http::Proxy \"$http_proxy\";" | \
+sudo tee /etc/apt/apt.conf.d/proxy.conf > /dev/null
