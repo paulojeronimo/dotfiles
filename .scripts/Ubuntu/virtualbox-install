@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+BASE_DIR=`cd "$(dirname "$0")"; pwd`
+
+sudo add-apt-repository multiverse && sudo apt-get update
+sudo apt install virtualbox virtualbox-ext-pack
