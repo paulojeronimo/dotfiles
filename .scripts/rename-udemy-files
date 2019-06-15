@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+BASE_DIR=$1
+
+[ "$BASE_DIR" ] || {
+  echo "You must specifiy a directory!"
+  exit 1
+}
+
+[ -d "$BASE_DIR" ] || {
+  echo "\"$BASE_DIR\" is not a valid directory!"
+  exit 1
+}
+
+cd "$BASE_DIR"
+
+echo "Renaming files in \"$BASE_DIR\" ..."
+
+echo "Removing non video files ..."
+find . -type f ! \( -name '*.vtt' -o -name '*.mp4' \) -delete
+
+echo "Renaming directories ..."
+rename 's/^([1-9]\.)/0$1/' *
+
+max=$(ls -d [1-9]* | tail -1 | cut -d'.' -f1)
+for i in $(seq -f '%02g' 1 $max)
+do
+  pushd $i* &> /dev/null && dir=$PWD || continue
+  echo -n "Entering \"$dir\". "
+
+  if [ "$(ls -A "$dir")" ]
+  then
+    echo "Renaming files ..."
+    rename 's/^([1-9]\.)/0$1/' *
+    rename "s/^(.*)/$i.\$1/" *
+
+    echo "Moving renamed files to parent ..."
+    mv * ..
+  else
+    echo "Nothing to do here ..."
+  fi
+
+  echo "Leaving and removing current dir  ..."
+  popd &> /dev/null
+  rmdir "$dir"
+done
