@@ -19,10 +19,11 @@ echo "Renaming files in \"$BASE_DIR\" ..."
 echo "Removing non video files ..."
 find . -type f ! \( -name '*.vtt' -o -name '*.mp4' \) -delete
 
+max=$(ls -d [1-9]* | tail -1 | cut -d'.' -f1)
+
 echo "Renaming directories ..."
 rename 's/^([1-9]\.)/0$1/' *
 
-max=$(ls -d [1-9]* | tail -1 | cut -d'.' -f1)
 for i in $(seq -f '%02g' 1 $max)
 do
   pushd $i* &> /dev/null && dir=$PWD || continue
