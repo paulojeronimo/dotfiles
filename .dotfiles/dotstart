@@ -15,7 +15,8 @@ unset f
 
 # Configura o PATH
 [[ $PLATAFORMA = Cygwin ]] && export PATH=~/bin:$PATH
-export PATH=~/.scripts:~/.scripts/`distro`:$PATH
+export PATH=~/.scripts:~/.scripts/docker:$PATH
+[[ $PLATAFORMA = Linux ]] && export PATH=~/.scripts/`distro`:$PATH
 
 # Ajusta e carrega o ambiente (se ele não for /dev/null)
 export ENVIRONMENT=/dev/null

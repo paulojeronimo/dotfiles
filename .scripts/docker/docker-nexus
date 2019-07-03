@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+DEBUG=${DEBUG:-false}
+$DEBUG && set -x || set +x
+
+DOCKER_IMG=sonatype/nexus3
+DOCKER_NAME=nexus
+DATA_DIR=~/Data/nexus
+
+check-data-dir() {
+    if ! [ -d "$DATA_DIR" ]
+    then
+        echo "Nexus DATA_DIR ($DATA_DIR) does not exists! Creating it ..."
+        mkdir -p "$DATA_DIR"
+    fi
+}
+
+help() {
+    echo "Usage: $0 <help|start|show-admin-password|tail-logs>"
+}
+
+start() {
+    check-data-dir
+    docker run -d -p 8081:8081 --name $DOCKER_NAME -v $DATA_DIR:/nexus-data $DOCKER_IMG
+}
+
+tail-logs() {
+    tail -f "$DATA_DIR"/log/{request,nexus}.log
+}
+
+show-admin-password() {
+    local admin_password=$DATA_DIR/admin.password
+
+    if [ -f "$admin_password" ]
+    then
+        cat "$admin_password"
+    else
+        printf "File \"$admin_password\" does not exists!\nPassword already configured?\n"
+    fi
+}
+
+op=${1:-help}
+type $op &> /dev/null || {
+    echo "\"$op\" is not a valid option!"
+    help
+    exit 1
+}
+$op

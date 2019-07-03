@@ -316,6 +316,12 @@ findf() {
   find . -type f | egrep "$@"
 }
 
+# List files and dirs excluding Git files
+find-not-git() {
+  [ -d .git ] || echo "This dir doesn't seem to be a git repo ... Aborting"
+  find . ! \( -name './.git' -o -path './.git/*' \) "$@"
+}
+
 # Procura por uma string (expressão regular), dentro de um arquivo no diretório atual e abaixo
 grepf() {
   find . -type f -print0 | xargs -0 egrep "$@"

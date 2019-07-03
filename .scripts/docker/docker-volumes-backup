@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# * Purpose: Backup my docker volumes
+# * References:
+# ** https://forums.docker.com/t/where-is-the-default-volume-location/17093
+# ** https://wiki.alpinelinux.org/wiki/Edge
+#
+DEBUG=${DEBUG:-false}
+$DEBUG && set -x || set +x
+
+BACKUPS_DIR=${BACKUPS_DIR:-~/Backups/docker}
+BACKUP=volumes.tgz
+DOCKER_IMAGE=alpine:edge
+
+mkdir -p "$BACKUPS_DIR" && cd "$_"
+echo "Doing docker volumes backup on \"$PWD\" ..."
+
+docker run --rm -it -v $PWD:/backup -v /var/lib/docker:/docker $DOCKER_IMAGE tar cvf /backup/$BACKUP /docker/volumes
