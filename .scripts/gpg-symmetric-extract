@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#
+# Purpose: Compact and extract files using GPG assimetric encryption
+# Tested on: macOS environment with Bash version 5.0.7(1)-release
+#
+# Note: The following lines must be present in~/.bash_profile file:
+# # https://superuser.com/a/1456169
+# export GPG_TTY=$(tty)
+#
+DEBUG=${DEBUG:-false}
+$DEBUG && set -x || set +x
+
+compact() {
+    local file=$1
+    if [ -f "$file" ]
+    then
+        if [ "${file##*.}" = gpg ]
+        then
+            echo "File \"$file\" seens to be is already encrypted!"
+            exit 1
+        fi
+        gpg -c "$file"
+    elif [ -d "$file" ]
+    then
+        # if last char is / remove it ...
+        [[ ${file: -1} = / ]] && file=${file%?}
+
+        tar cvfj - $file/ | gpg -c > `basename "$file"`.tar.bz2.gpg
+    fi
+}
+
+extract() {
+    file=$1
+    if [ "${file##*.}" = gpg ]
+    then
+        file="${file%.*}"
+    else
+        echo "File must terminate with a \"gpg\" extension!"
+        exit 1
+    fi
+    extension="${file#*.}"
+    filename="${file%%.*}"
+    cmd="tar xvf"
+    case "$extension" in
+        tar.bz2)
+            cmd="${cmd}j -"
+            ;;
+        tar.gz)
+            cmd="${cmd}z -"
+            ;;
+        *)
+            echo "Could not handle files with \"$extension\" extension!"
+            exit 1
+            ;;
+    esac
+    if [ -d "$filename" ]
+    then
+        read -p "Directory \"$filename\" already exists! Override? (y|N): " -n 1 -r
+        echo
+        if ! [[ $REPLY =~ ^[Y|y]$ ]]
+        then
+            echo "Aborting $file.gpg extraction ..."
+            exit 0
+        fi
+        rm -rf "$filename"
+    fi
+    extraction_dir=`dirname "${filename%%./}"`
+    cmd="gpg -d \"$file.gpg\" | $cmd -C \"$extraction_dir\""
+    echo "$cmd"
+    log=`mktemp`
+    if ! eval "$cmd" | tee $log
+    then
+        result=$?
+        exit $result
+    fi
+}
+
+help() {
+    echo "Usage: $0 <file|-r file>"
+}
+
+[ "$1" ] || { help; exit 0; }
+if [ "$1" = "-r" ]
+then
+    shift
+    compact "$1"
+else
+    extract "$1"
+fi
