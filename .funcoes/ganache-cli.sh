@@ -25,8 +25,13 @@ gc() {
 
   gc_pid() {
     local result
+    local cmd
     set -o pipefail
-    pgrep -a node | grep ganache-cli | awk '{print $1}'
+    case `uname` in
+      Linux) cmd="pgrep -a node | grep ganache-cli";;
+      Darwin) cmd="ps -a | grep ganache-cli | grep -v grep";;
+    esac
+    eval $cmd | awk '{print $1}'
     result=$?
     set +o pipefail
     return $result
