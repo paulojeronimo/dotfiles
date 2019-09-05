@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set +x
+
+dir=$1
+[ "$dir" ] || dir=.
+
+find "$dir" -type f \( \
+  -name "*.mp4" -o \
+  -name "*.wbem" -o \
+  -name "*.mkv" \)
