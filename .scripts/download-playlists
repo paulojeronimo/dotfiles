@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set +x
+
+PLAYLISTS=playlists.txt
+
+[ -f "$PLAYLISTS" ] || {
+  echo "File \"$PLAYLISTS\" not found!"
+  exit 0
+}
+
+while read playlist
+do
+  #https://github.com/ytdl-org/youtube-dl#options
+  youtube-dl -co '%(playlist)s/%(playlist_index)s - %(title)s-%(id)s.%(ext)s' "$playlist"
+done < "$PLAYLISTS"
