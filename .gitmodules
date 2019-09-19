@@ -13,3 +13,12 @@
 [submodule ".vim/bundle/vim-solidity"]
 	path = .vim/bundle/vim-solidity
 	url = https://github.com/tomlion/vim-solidity.git
+[submodule ".vim/bundle/nerdtree"]
+	path = .vim/bundle/nerdtree
+	url = https://github.com/scrooloose/nerdtree.git
+[submodule ".vim/bundle/vim-tiddlywiki"]
+	path = .vim/bundle/vim-tiddlywiki
+	url = https://github.com/sukima/vim-tiddlywiki
+[submodule ".vim/bundle/vim-mdx-js"]
+	path = .vim/bundle/vim-mdx-js
+	url = https://github.com/jxnblk/vim-mdx-js
