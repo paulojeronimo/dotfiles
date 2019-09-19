@@ -3,6 +3,11 @@ set +x
 
 PLAYLISTS=playlists.txt
 
+[ "$1" = "-f" ] && {
+  shift
+  PLAYLISTS=$1
+}
+
 [ -f "$PLAYLISTS" ] || {
   echo "File \"$PLAYLISTS\" not found!"
   exit 0
