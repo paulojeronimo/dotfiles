@@ -1,3 +1,9 @@
 [settings]
-file = todo.txt
-archive = done.txt
+file = $PWD/TODO/todo.txt
+archive = $PWD/TODO/done.txt
+auto-save = True
+show-toolbar = False
+show-filter-panel = False
+enable-borders = False
+enable-word-wrap = True
+colorscheme = myawesometheme
