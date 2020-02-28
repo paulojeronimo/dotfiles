@@ -1,6 +1,3 @@
-[submodule ".vim/bundle/nerdtree"]
-	path = .vim/bundle/nerdtree
-	url = https://github.com/scrooloose/nerdtree.git
 [submodule ".vim/bundle/vim-tiddlywiki"]
 	path = .vim/bundle/vim-tiddlywiki
 	url = https://github.com/sukima/vim-tiddlywiki
