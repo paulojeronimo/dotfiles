@@ -1,6 +1,3 @@
-[submodule ".vim/bundle/vim-es6"]
-	path = .vim/bundle/vim-es6
-	url = https://github.com/isruslan/vim-es6.git
 [submodule ".vim/bundle/vim-solidity"]
 	path = .vim/bundle/vim-solidity
 	url = https://github.com/tomlion/vim-solidity.git
