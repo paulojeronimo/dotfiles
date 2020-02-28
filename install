@@ -132,6 +132,14 @@ submodules_init() {
    popd &> /dev/null
 }
 
+install_vim_plugins() {
+   which vim &> /dev/null && {
+      echo "Installing Vim plugins (via Vundle) ..."
+      # https://github.com/junegunn/vim-plug/issues/225#issuecomment-466044365
+      vim +PluginInstall +qall > /dev/null
+   }
+}
+
 # Processing starts here ...
 if [ "$OP" = "install" ]
 then
@@ -179,6 +187,7 @@ then
       echo "File \"$DOTSTART_FILE\" does not exists! Creating it from \"$DOTSTART_TEMPLATE_FILE\"!"
    fi
    sed "s,DOTSTART_FILE,$DOTSTART_FILE,g" $DOTSTART_TEMPLATE_FILE > $DOTSTART_FILE
+   install_vim_plugins
    echo "Files installed! For effect, you need to restart your shell!"
    #case $OSTYPE in
    #   cygwin) $BASEDIR/.scripts/fixvim;;

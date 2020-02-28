@@ -346,9 +346,56 @@ grepj() {
 #  }
 #}
 
-# Vai para o diretório do projeto dotfiles
+#* Refs:
+#** https://git-scm.com/book/en/v2/Git-Tools-Submodules
+#** https://stackoverflow.com/a/16162000
 dotfiles() {
+  local op=$1
   cd "$DOTFILES_HOME"
+  [ "$op" ] && case "$op" in
+    submodule)
+      shift
+      local submodule_op=$1
+      [ "$submodule_op" ] || {
+        echo '"rm" or "add" must be specified'
+        return 1
+      }
+      shift 
+      local module=$1 
+      [ "$module" ] || {
+        echo "module must be specified"
+        return 1
+      }
+      case "$submodule_op" in
+        add)
+          shift
+          local url=$1
+          [ "$url" ] || {
+            echo "url must be specified"
+            return 1
+          }
+          git submodule add $url $module
+          git commit -m "Added submodule $module"
+          ;;
+        rm)
+          local module_dir=.git/modules/$module
+          [ -d "$module_dir" ] || {
+            echo "directory \"$PWD/$module_dir\" does not exists!"
+            return 1
+          }
+          git submodule deinit -f -- $module
+          rm -rf $module_dir
+          git rm -f $module
+          git commit -m "Removed submodule $module"
+          ;;
+      esac
+      ;;
+    *)
+      echo "Unknown op: $op"
+      return 1
+      ;;
+  esac
+  ! [ "$op" ] || cd - &> /dev/null
 }
 
 # Vai para o diretório de downloads

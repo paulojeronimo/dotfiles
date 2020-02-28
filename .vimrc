@@ -1,7 +1,21 @@
-" Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
-" File ~/.vimrc (Vim configurations) in pj@pj-macbookpro
+set nocompatible " be iMproved, required by Vundle
+filetype off     " required by Vundle
 
-call pathogen#infect()
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'slim-template/vim-slim'
+Plugin 'kchmck/vim-coffee-script'
+Plugin 'digitaltoad/vim-pug'
+Plugin 'isruslan/vim-es6'
+Plugin 'tomlion/vim-solidity'
+Plugin 'scrooloose/nerdtree'
+Plugin 'sukima/vim-tiddlywiki'
+Plugin 'jxnblk/vim-mdx-js'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+call vundle#end()
+
 syntax enable
 filetype plugin indent on
 set expandtab
@@ -13,8 +27,6 @@ set encoding=utf-8
 colorscheme desert
 
 " http://bit.ly/37tB1Ne
-" 60 columns asciidoc files
-au BufRead,BufNewFile *.adoc setlocal textwidth=60
-
 " https://stackoverflow.com/a/3765575
-set colorcolumn=60
+au BufRead,BufNewFile *.adoc setlocal textwidth=50 colorcolumn=50
+au BufRead,BufNewFile *.js setlocal textwidth=80 colorcolumn=80

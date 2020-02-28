@@ -1,0 +1,30 @@
+= Dot files
+
+Here you will find my dotfile (`~/.file`)
+configurations.
+
+Also, there are some very basic utilities
+that I wrote in Bash, Python or other some
+script languages.
+Some of then are very tied to my environment so,
+if you want to use this on your own,
+you will have to adapt it to your needs.
+
+To start using this repo it in your own
+environment, you will need to clone this repo
+and, after that run the `install` command:
+
+----
+$ git clone https://github.com/paulojeronimo/dotfiles
+$ ./dotfiles/install
+----
+
+Do you want to remove these dotfiles from
+your environment? It´s very simple! 😃
+Only do this:
+
+----
+$ ./dotfiles/remove
+----
+
+TODO: fix symbolic links errors when using Cygwin

@@ -1,6 +1,10 @@
 # https://raw.github.com/git/git/master/contrib/completion/git-prompt.sh
 f=~/.gitprompt; [ -f "$f" ] && source "$f"; unset f
 
+GIT_PS1_SHOWDIRTYSTATE=true
+GIT_PS1_SHOWCOLORHINTS=true
+GIT_PS1_UNTRACKEDFILES=true
+
 # http://code-worrier.com/blog/git-branch-in-bash-prompt/
 # http://stackoverflow.com/questions/4133904/ps1-line-with-git-current-branch-and-colors
 export TTYNAME=`tty|cut -b 6-`
