@@ -9,7 +9,7 @@
 	url = https://github.com/digitaltoad/vim-pug.git
 [submodule ".vim/bundle/vim-es6"]
 	path = .vim/bundle/vim-es6
-	url = https://github.com/isRuslan/vim-es6.git
+	url = https://github.com/isruslan/vim-es6.git
 [submodule ".vim/bundle/vim-solidity"]
 	path = .vim/bundle/vim-solidity
 	url = https://github.com/tomlion/vim-solidity.git
@@ -22,6 +22,3 @@
 [submodule ".vim/bundle/vim-mdx-js"]
 	path = .vim/bundle/vim-mdx-js
 	url = https://github.com/jxnblk/vim-mdx-js
-[submodule ".vim/bundle/Vundle"]
-	path = .vim/bundle/Vundle
-	url = https://github.com/VundleVim/Vundle.vim.git
