@@ -30,3 +30,11 @@ colorscheme desert
 " https://stackoverflow.com/a/3765575
 au BufRead,BufNewFile *.adoc setlocal textwidth=50 colorcolumn=50
 au BufRead,BufNewFile *.js setlocal textwidth=80 colorcolumn=80
+
+" https://vi.stackexchange.com/a/430
+set list
+if has('gui_running')
+  set listchars=eol:⏎,tab:▶\ ,trail:·,extends:\#,nbsp:.
+else
+  set listchars=eol:⏎,tab:>.,trail:.,extends:\#,nbsp:.
+endif
