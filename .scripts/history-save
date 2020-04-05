@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#
+# http://www.tldp.org/LDP/abs/html/histcommands.html
+# https://unix.stackexchange.com/questions/5684/history-command-inside-bash-script
+# http://jesrui.sdf-eu.org/remember-all-your-bash-history-forever.html
+#
+DEBUG=${DEBUG:-false}
+$DEBUG && set -x || set +x
+set -eou pipefail
+
+BASEDIR=`cd "$(dirname "$0")"; pwd`
+HISTORY_DIR=${HISTORY_DIR:-~/Desktop/log/bash-history}
+
+cd "$HISTORY_DIR"
+
+machine=`hostname -s`
+today=`date +%F`
+file_found=false
+last_file=`ls -t history.$machine.*.txt 2> /dev/null | head -1` && \
+  file_found=true || \
+  last_file=history.$machine.$today.1.txt
+next_index=`echo $last_file | cut -d. -f4`
+
+$file_found && {
+  (( next_index++ ))
+  next_file=history.$machine.$today.$next_index.txt
+} || {
+  next_file=history.$machine.$today.1.txt
+}
+
+HISTFILE=~/.bash_history
+set -o history
+history > $next_file
+echo "History saved in \"$next_file\" file"
