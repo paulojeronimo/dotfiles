@@ -14,6 +14,7 @@ Plugin 'sukima/vim-tiddlywiki'
 Plugin 'jxnblk/vim-mdx-js'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+Plugin 'tpope/vim-fugitive'
 call vundle#end()
 
 syntax enable
