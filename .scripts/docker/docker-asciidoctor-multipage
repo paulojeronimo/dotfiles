@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker run -it --rm -v "$PWD":/documents paulojeronimo/asciidoctor-multipage:1.5.7.1 "$@"
