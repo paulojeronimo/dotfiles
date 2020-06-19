@@ -15,6 +15,7 @@ Plugin 'jxnblk/vim-mdx-js'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tpope/vim-fugitive'
+Plugin 'vmchale/dhall-vim'
 call vundle#end()
 
 syntax enable
@@ -29,7 +30,7 @@ colorscheme desert
 
 " http://bit.ly/37tB1Ne
 " https://stackoverflow.com/a/3765575
-au BufRead,BufNewFile *.adoc setlocal textwidth=50 colorcolumn=50
+"au BufRead,BufNewFile *.adoc setlocal textwidth=50 colorcolumn=50
 au BufRead,BufNewFile *.js setlocal textwidth=80 colorcolumn=80
 
 " https://vi.stackexchange.com/a/430
