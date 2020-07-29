@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# References:
+#   Ref1: https://askubuntu.com/a/469191
+#   Ref2: https://phoenixnap.com/kb/rsync-exclude-files-and-directories
+#
+set -eou pipefail
+THIS_DIR=`cd "$(dirname "$0")"; pwd`
+BASE_DIR=${1:-`cd "$PWD"; pwd -P`}
+config=$BASE_DIR/.sync-to-public
+source "$config" &> /dev/null || {
+  echo -e "File \"$config\" not found!\nAborting with exit status 1 ..."
+  exit 1
+}
+public_repo=${public_repo:-`dirname "$BASE_DIR"`/`basename "${BASE_DIR%-private}"`}
+
+tmpfile=`mktemp`
+echo ".sync-to-public
+$excludes" > $tmpfile
+
+cd "$BASE_DIR"
+mkdir -p "$public_repo"
+
+echo "Syncing files ..."
+echo "  From: $PWD"
+echo "  To: $public_repo"
+# Ref1 Ref2
+rsync -av --exclude-from=$tmpfile --update --delete ./ "$public_repo"/
