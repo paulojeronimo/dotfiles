@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -eou pipefail
+shared_folder=$1
+setup_vm=~/$shared_folder/ubuntu/scripts/setup-vm
+mkdir -p ~/$shared_folder
+sudo mount -t vboxsf -o uid=`id -u`,gid=`id -g` $shared_folder ~/$shared_folder
+if [ -x $setup_vm ]; then
+  $setup_vm
+  while :; do
+    sudo umount $shared_folder &> /dev/null || break
+    mount | grep -q $shared_folder && echo "$shared_folder still mounted!" || break
+    sleep 1
+  done
+  rmdir $shared_folder
+  mv $shared_folder.tmp $shared_folder
+  $shared_folder/host.mount
+fi
