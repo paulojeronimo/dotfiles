@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+docker_container=${docker_container:-$1}
+docker_image=${docker_image:-$2}
+
+docker images | if ! grep -q debug/$docker_image; then
+  docker commit $docker_container debug/$docker_image
+fi
+
+docker run -it --rm --entrypoint sh debug/$docker_image
