@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -eou pipefail
+gh_projects=${gh_projects:-~/Projects/github.com}
+count=0
+for d in `find . -type d -name .git`
+do
+  cd $d
+  (( ++count ))
+  url=$(git remote get-url origin)
+  if [[ $url =~ ^https:// ]]
+  then
+    git_origin=${url##*//}
+    if [ "${git_origin%%/*}" = "github.com" ]; then
+      gh_project=${git_origin#github.com/}
+    else
+      unset gh_project
+    fi
+  else
+    echo "$url not supported!"
+  fi
+  cd $OLDPWD
+  if [ "$gh_project" ]; then
+    d=${d%/.git}
+    mkdir -p $gh_projects/${gh_project%/*}
+    rsync -a $d $gh_projects/${gh_project%/*}
+    rm -rf $d
+    ln -s $gh_projects/$gh_project
+    echo "$d moved to $gh_projects/$gh_project"
+  fi
+done
+if (( count != 0 )); then
+  (( count = 1 )) && repositories=repository || repositories=repositories
+  echo "Moved $count git $repositories!"
+fi
