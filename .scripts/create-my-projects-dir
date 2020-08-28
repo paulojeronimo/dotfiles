@@ -5,6 +5,7 @@ for dir in $(find ~/Projects/ \
   -mindepth 2 -maxdepth 2 -type d \
   -path '*paulojeronimo')
 do
+  ! [[ $OSTYPE =~ ^darwin ]] || dir=${dir//\/\//\/}
   base=${dir##*Projects/}
   base=${base%/paulojeronimo}
   ln -s ../${dir#$HOME/} $base
