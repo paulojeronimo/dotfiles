@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# https://stackoverflow.com/questions/13263369/getting-a-list-of-all-unversioned-files-in-a-git-controlled-folder
+
+git clean -dnx | cut -c 14-
