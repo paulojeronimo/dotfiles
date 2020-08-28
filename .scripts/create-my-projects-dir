@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -eou pipefail
+mkdir -p ~/My\ Projects && cd "$_"
+for dir in $(find ~/Projects/ \
+  -mindepth 2 -maxdepth 2 -type d \
+  -path '*paulojeronimo')
+do
+  base=${dir##*Projects/}
+  base=${base%/paulojeronimo}
+  ln -s ../${dir#$HOME/} $base
+done
