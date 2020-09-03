@@ -24,4 +24,8 @@ screenshot() {
   gnome-screenshot "$@"
 }
 
+open() {
+  xdg-open "$@"
+}
+
 # vim: set tabstop=2 shiftwidth=2 expandtab:
