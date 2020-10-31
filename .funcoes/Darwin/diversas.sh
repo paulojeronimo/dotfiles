@@ -40,3 +40,18 @@ disableDotDS_Store() {
 brew_install() {
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 }
+
+jdk() {
+	! [ $# = 0 ] || {
+		cat - <<-EOF
+		Usage: `basename $0` [1.8|11|15]
+		EOF
+		return
+	}
+
+	case "$1" in
+		"1.8"|11|15) v=$1;;
+		*) echo "Invalid jdk version!"; return 1;;
+	esac
+	export JAVA_HOME=$(/usr/libexec/java_home -v $1)
+}

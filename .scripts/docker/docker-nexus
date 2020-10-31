@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
-DEBUG=${DEBUG:-false}
-$DEBUG && set -x || set +x
+# References
+# 	Primary: https://hub.docker.com/r/sonatype/nexus3
+# 	MavenProxyConfiguration:
+#		- https://blog.sonatype.com/using-nexus-3-as-your-repository-part-1-maven-artifacts
+#	CLI:
+#		- https://support.sonatype.com/hc/en-us/articles/213465898-What-command-line-tools-are-available-for-Nexus-
+#		- https://nexus-doc.readthedocs.io/en/dev/usage.html
+#	RepositoriesConfiguration:
+#		- http://www.mastertheboss.com/jboss-frameworks/maven-tutorials/jboss-maven/configure-a-local-nexus-repository-manager-for-your-jboss-wildfly-artifacts
 
-DOCKER_IMG=sonatype/nexus3
+set -eou pipefail
+
+PORT=${PORT:-8081}
+URL=${URL:-http://localhost:$PORT}
+#DOCKER_IMG=sonatype/nexus3
+DOCKER_IMG=bradbeck/nexus-https
 DOCKER_NAME=nexus
 DATA_DIR=~/Data/nexus
 
@@ -15,12 +27,12 @@ check-data-dir() {
 }
 
 help() {
-    echo "Usage: $0 <help|start|show-admin-password|tail-logs>"
+    echo "Usage: $0 <help|start|show-admin-password|tail-logs|open-console|create-m2-settings>"
 }
 
 start() {
     check-data-dir
-    docker run -d -p 8081:8081 --name $DOCKER_NAME -v $DATA_DIR:/nexus-data $DOCKER_IMG
+    docker run -d -p $PORT:8081 -p 8443:8443 --name $DOCKER_NAME -v $DATA_DIR:/nexus-data $DOCKER_IMG
 }
 
 tail-logs() {
@@ -36,6 +48,65 @@ show-admin-password() {
     else
         printf "File \"$admin_password\" does not exists!\nPassword already configured?\n"
     fi
+}
+
+open-console() {
+	open $URL
+}
+
+create-m2-settings() {
+	local settings=~/.m2/settings.xml
+	! [ -f $settings ] || cp $settings $settings.`date +%s`
+	cat <<-EOF > $settings
+	<?xml version="1.0" encoding="utf-8"?>
+	<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+		<mirrors>
+			<mirror>
+				<!--This sends everything else to /public -->
+				<id>nexus</id>
+				<mirrorOf>*</mirrorOf>
+				<url>http://localhost:8081/repository/maven-public/</url>
+			</mirror>
+		</mirrors>
+		<profiles>
+			<profile>
+				<id>nexus</id>
+				<!--Enable snapshots for the built in central repo to direct -->
+				<!--all requests to nexus via the mirror -->
+				<repositories>
+					<repository>
+						<id>central</id>
+						<url>http://central</url>
+						<releases>
+							<enabled>true</enabled>
+						</releases>
+						<snapshots>
+							<enabled>true</enabled>
+						</snapshots>
+					</repository>
+				</repositories>
+				<pluginRepositories>
+					<pluginRepository>
+						<id>central</id>
+						<url>http://central</url>
+						<releases>
+							<enabled>true</enabled>
+						</releases>
+						<snapshots>
+							<enabled>true</enabled>
+						</snapshots>
+					</pluginRepository>
+				</pluginRepositories>
+			</profile>
+		</profiles>
+		<activeProfiles>
+			<!--make the profile active all the time -->
+			<activeProfile>nexus</activeProfile>
+		</activeProfiles>
+	</settings>
+	EOF
 }
 
 op=${1:-help}

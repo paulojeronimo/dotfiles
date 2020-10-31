@@ -4,7 +4,7 @@ gh_projects=${gh_projects:-~/Projects/github.com}
 count=0
 for d in `find . -type d -name .git`
 do
-  cd $d
+  cd "$d"
   (( ++count ))
   url=$(git remote get-url origin)
   if [[ $url =~ ^https:// ]]
@@ -18,13 +18,13 @@ do
   else
     echo "$url not supported!"
   fi
-  cd $OLDPWD
-  if [ "$gh_project" ]; then
+  cd "$OLDPWD"
+  if [ "${gh_project:-}" ]; then
     d=${d%/.git}
     mkdir -p $gh_projects/${gh_project%/*}
     rsync -a $d $gh_projects/${gh_project%/*}
     rm -rf $d
-    ln -s $gh_projects/$gh_project
+    ln -s "$gh_projects/$gh_project"
     echo "$d moved to $gh_projects/$gh_project"
   fi
 done
