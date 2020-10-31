@@ -25,10 +25,15 @@ export ENVIRONMENT=/dev/null
 # Apresenta a data e a hora da sessão (se estivermos num login shell)
 shopt -q login_shell && date +"Sessão iniciada em %F às %T"
 
-# Start TMUX (Ref: https://unix.stackexchange.com/a/113768)
-command -v tmux &> /dev/null && \
+[ "$USE_TMUX" ] || {
+  [[ $OSTYPE =~ darwin ]] && USE_TMUX=true || USE_TMUX=false
+}
+! $USE_TMUX || {
+  # Start TMUX (Ref: https://unix.stackexchange.com/a/113768)
+  command -v tmux &> /dev/null && \
     [ -n "$PS1" ] && \
     [[ ! "$TERM" =~ screen ]] && \
     [[ ! "$TERM" =~ tmux ]] && \
     [ -z "$TMUX" ] && \
     exec tmux
+}
