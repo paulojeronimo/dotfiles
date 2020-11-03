@@ -413,4 +413,16 @@ ruby_httpd() {
   ruby -run -e httpd . -p 5000
 }
 
+mb1() {
+  ssh pj-macbook1.local "$@"
+}
+
+mb2() {
+  ssh pj-macbook2.local "$@"
+}
+
+vmu() {
+  ssh vm-ubuntu "$@"
+}
+
 # vim: set tabstop=2 shiftwidth=2 expandtab:
