@@ -24,7 +24,9 @@ do
     mkdir -p $gh_projects/${gh_project%/*}
     rsync -a $d $gh_projects/${gh_project%/*}
     rm -rf $d
+    cd `dirname $d`
     ln -s "$gh_projects/$gh_project"
+    cd $OLDPWD
     echo "$d moved to $gh_projects/$gh_project"
   fi
 done
@@ -32,3 +34,5 @@ if (( count != 0 )); then
   (( count = 1 )) && repositories=repository || repositories=repositories
   echo "Moved $count git $repositories!"
 fi
+
+# vim: et ts=2 sw=2
