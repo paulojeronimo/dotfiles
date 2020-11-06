@@ -1,1 +1,8 @@
-sudo vmhgfs-fuse .host:/pj /mnt/pj -o allow_other -o uid=1000 -o gid=1000
+#!/usr/bin/env bash
+set -eou pipefail
+
+script=~/Applications/mounter/fusion.mount
+[ -f $script ] && $script || {
+	echo "Script \"$script\" not found!"
+	exit 1
+}

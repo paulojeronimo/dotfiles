@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+RELEASE=${RELEASE:-1.27.4}
+sudo curl -L "https://github.com/docker/compose/releases/download/${RELEASE}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
