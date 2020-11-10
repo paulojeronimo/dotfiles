@@ -10,6 +10,6 @@ DIR_NAME=${GISTS_DIR#$BASE_DIR/}
 }
 [ -f ~/.$SCRIPT ] || (cd; d=${BASE_DIR#$HOME/}; d=${d%/*}; ln -s "$d"/.$SCRIPT)
 rm -rf "$GISTS_DIR"; mkdir -p "$_"; cd "$_"
-while IFS= read gist; do git clone git@gist.github.com:$gist; done < ~/.$SCRIPT
-for bin in $(find . -maxdepth 2 -type f -executable); do ln -s $bin; done
+while IFS= read gist; do git clone https://gist.github.com/$gist; done < ~/.$SCRIPT
+for bin in $(find . -maxdepth 2 \( -type f -o -type l \) -executable); do ln -s $bin; done
 echo $DIR_NAME
