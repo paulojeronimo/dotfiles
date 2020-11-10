@@ -1,7 +1,5 @@
 #!/bin/bash
 # Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
-#
-# Arquivo DOTSTART_FILE (gerado a partir do .dotfiles/dotstart)
 
 # Habilita mais mensagens se configurado para true
 # Configure aqui, ou antes num dos arquivos de inicialização (~/.bashrc, ~/.profile)
@@ -14,9 +12,12 @@ carregar_arquivos_em ~/.{configuracoes,funcoes}{,/$PLATAFORMA} -i $f
 unset f
 
 # Configura o PATH
-[[ $PLATAFORMA = Cygwin ]] && export PATH=~/bin:$PATH
-export PATH=~/.scripts:~/.scripts/docker:$PATH
-[[ $PLATAFORMA = Linux ]] && export PATH=~/.scripts/`distro`:$PATH
+[[ $PLATAFORMA = Cygwin ]] && PATH=~/bin:$PATH
+PATH=~/.scripts:$PATH
+PATH=~/.scripts/`boot-gists`:$PATH
+PATH=~/.scripts/docker:$PATH
+[[ $PLATAFORMA = Linux ]] && PATH=~/.scripts/`distro`:$PATH
+export PATH
 
 # Ajusta e carrega o ambiente (se ele não for /dev/null)
 export ENVIRONMENT=/dev/null
@@ -26,14 +27,16 @@ export ENVIRONMENT=/dev/null
 shopt -q login_shell && date +"Sessão iniciada em %F às %T"
 
 [ "$USE_TMUX" ] || {
-  [[ $OSTYPE =~ darwin ]] && USE_TMUX=true || USE_TMUX=false
+	[[ $OSTYPE =~ darwin ]] && USE_TMUX=true || USE_TMUX=false
 }
 ! $USE_TMUX || {
-  # Start TMUX (Ref: https://unix.stackexchange.com/a/113768)
-  command -v tmux &> /dev/null && \
-    [ -n "$PS1" ] && \
-    [[ ! "$TERM" =~ screen ]] && \
-    [[ ! "$TERM" =~ tmux ]] && \
-    [ -z "$TMUX" ] && \
-    exec tmux
+	# Start TMUX (Ref: https://unix.stackexchange.com/a/113768)
+	command -v tmux &> /dev/null && \
+		[ -n "$PS1" ] && \
+		[[ ! "$TERM" =~ screen ]] && \
+		[[ ! "$TERM" =~ tmux ]] && \
+		[ -z "$TMUX" ] && \
+		exec tmux
 }
+
+! [ $PLATAFORMA = Linux ] || vm `vm-type`

@@ -181,12 +181,12 @@ then
    if [ -f "$DOTSTART_FILE" ]
    then
       BACKUP="$DOTSTART_FILE".`date "+%Y%m%d-%H%M%S"`
-      echo "File \"$DOTSTART_FILE\" exists! Moving it to \"$BACKUP\"!"
-      mv "$DOTSTART_FILE" "$BACKUP"
+      echo "File \"$DOTSTART_FILE\" exists! Copying it to \"$BACKUP\"!"
+      cp -L "$DOTSTART_FILE" "$BACKUP"
    else
-      echo "File \"$DOTSTART_FILE\" does not exists! Creating it from \"$DOTSTART_TEMPLATE_FILE\"!"
+      echo "File \"$DOTSTART_FILE\" does not exists! Linking it to \"$DOTSTART_TEMPLATE_FILE\"!"
    fi
-   sed "s,DOTSTART_FILE,$DOTSTART_FILE,g" $DOTSTART_TEMPLATE_FILE > $DOTSTART_FILE
+   ln -sf "$DOTSTART_TEMPLATE_FILE" "$DOTSTART_FILE"
    install_vim_plugins
    echo "Files installed! For effect, you need to restart your shell!"
    #case $OSTYPE in
