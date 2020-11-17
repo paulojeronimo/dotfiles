@@ -16,7 +16,11 @@ OUT=${OUT:-`d=/tmp/out_${USER}; [ -d $d ] || mkdir -p $d; echo -n $d/$$.log`}
 case "$OSTYPE" in
   linux*) PLATAFORMA=Linux;;
   cygwin) PLATAFORMA=Cygwin;;
-  darwin*) PLATAFORMA=Darwin;;
+  darwin*)
+    PLATAFORMA=Darwin
+    sed() { gsed "$@"; }
+    export -f sed
+    ;;
 esac
 export PLATAFORMA
 
@@ -97,14 +101,6 @@ carregar_arquivos_em() {
 # Show PATH, one per line
 showpath() { echo $PATH | tr : '\n'; }
 
-# change a file with 'sed -i'
-sed_i() { 
-  case $PLATAFORMA in
-    Linux|Cygwin) sed -i "$@";;
-    Darwin) sed -i '' "$@";;
-  esac
-}
-
 # Change the loaded environment configured at this file
 setenv() {
   local env=$1
@@ -115,7 +111,7 @@ setenv() {
   fi
 
   if [ -f "$env" -o "$env" == /dev/null ]; then
-    sed_i "s,^\(export ENVIRONMENT=\)\(.*\),\1\"$env\",g" $DOTSTART_FILE
+    sed -i "s,^\(export ENVIRONMENT=\)\(.*\),\1\"$env\",g" $DOTSTART_FILE
     echo "Changes made at \"$DOTSTART_FILE\". For effect, reopen your shell."
   else
     echo "The file \"$env\" does'nt exists! Nothing was done."
