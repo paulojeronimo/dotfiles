@@ -36,3 +36,5 @@
   log-adog = log --all --decorate --oneline --graph
 [commit]
 	template = ~/.stCommitMsg
+[pull]
+	rebase = false

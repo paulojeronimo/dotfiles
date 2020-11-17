@@ -1,20 +1,16 @@
-#!/bin/bash
-# Author: Paulo Jerônimo (@paulojeronimo, pj@paulojeronimo.info)
-# Useful script to operate my dotfiles (files starting with a "." and located at $HOME)
-set +x
+#!/usr/bin/env bash
+set -eou pipefail
 
-BASEDIR=`cd "$(dirname "$0")"; echo -n $PWD`
+BASEDIR=`cd "$(dirname "$0")"; pwd`
 OP=${OP:-`basename "$0"`}
 
 # Dot files (and other dirs/files) included in this repo, excluding some not necessary files.
 DOTFILES='find "$DOTFILES_HOME"/ -maxdepth 1 ! \( -wholename "$DOTFILES_HOME"/ -o -name .git -o -name README.\* -o -name install -o -name remove -o -name .gitmodules \)'
-DOTFILES_HOME_FILE=~/.dotfiles/home
-DOTSTART_FILE=~/.ambiente
-DOTSTART_TEMPLATE_FILE=~/.dotfiles/dotstart
+DOTFILES_FILE=~/.dotfiles
 
 sed_i() {
    case `uname` in
-      Darwin) sed -i "" "$@";;
+      Darwin) unset -f sed; sed -i "" "$@";;
       *) sed -i "$@";;
    esac
 }
@@ -22,7 +18,7 @@ sed_i() {
 _dotstart_op() {
    local readonly mark='# Load startup environment for this machine'
    local op=$1
-   local profile=~/.profile
+   local profile=~/.bash_profile
    case `uname` in
       Linux|CYGWIN*) profile=~/.bashrc;;
    esac
@@ -31,22 +27,22 @@ _dotstart_op() {
    $1 $profile "$mark"
 }
 
-# Insert code on .profile (or .bashrc) to load $DOTSTART_FILE file
+# Insert code on $profile to load $DOTFILES_FILE file
 dotstart_install() {
    install() {
       local profile=$1
       local mark=$2
       if ! grep -q "^$mark" $profile
       then
-         echo "Changing $profile to load $DOTSTART_FILE file ..."
-         echo -e "$mark" >> $profile
-         echo -e "f=$DOTSTART_FILE; [ -f \"\$f\" ] && source \"\$f\"; unset f" >> $profile
+         echo "Changing $profile to load $DOTFILES_FILE file ..."
+         echo "$mark" >> $profile
+         echo 'source ~/.dotfiles' >> $profile
       fi
    }
    _dotstart_op install
 }
 
-# Remove the code from .profile (or .bashrc) that loads $DOTSTART_FILE file
+# Remove the code from $profile that loads $DOTFILES_FILE file
 dotstart_uninstall() {
    uninstall() {
       local profile=$1
@@ -62,7 +58,7 @@ _dotfiles() {
    local f
    local t
    local op=$1
-   
+
    for f in `eval $DOTFILES`
    do
       f=${f##*/}
@@ -91,7 +87,6 @@ _install() {
 
    case "$f" in
       .dotfiles|.gitignore)
-      echo "Skipping $t $f"
       return
       ;;
    esac
@@ -103,7 +98,7 @@ _install() {
       ;;
       *)
          echo "Linking $t $DOTFILES_HOME/$f to ~/$f"
-         ln -s "${DOTFILES_HOME/$HOME\/}/$f" ~/
+         ln -sf "${DOTFILES_HOME##$HOME/}/$f" ~/
       ;;
    esac
 }
@@ -112,15 +107,15 @@ _install() {
 _remove() {
    local f=$1
    local t=$2
-   
+
    echo "Unlinking $t ~/$f"
    case $OSTYPE in
-		cygwin)
-			rm -rf ~/$f
-		;;
-		*)
-			rm -f ~/$f
-		;;
+      cygwin)
+         rm -rf ~/$f
+      ;;
+      *)
+         rm -f ~/$f
+      ;;
    esac
 }
 
@@ -134,9 +129,9 @@ submodules_init() {
 
 install_vim_plugins() {
    which vim &> /dev/null && {
-      echo "Installing Vim plugins (via Vundle) ..."
+      echo "Installing Vim plugins via Vundle (please wait) ..."
       # https://github.com/junegunn/vim-plug/issues/225#issuecomment-466044365
-      vim +PluginInstall +qall > /dev/null
+      vim +PluginInstall +qall &> /dev/null
    }
 }
 
@@ -144,21 +139,18 @@ install_vim_plugins() {
 if [ "$OP" = "install" ]
 then
    echo "Installing dotfiles ..."
-   if ! [ "$DOTFILES_HOME" ]
+   if ! [ "${DOTFILES_HOME:-}" ]
    then
       export DOTFILES_HOME=$BASEDIR
-
       submodules_init
       case $OSTYPE in
          cygwin)
             cp -r "$DOTFILES_HOME"/.dotfiles ~/
          ;;
          *) 
-            ln -s "${DOTFILES_HOME/$HOME\/}/.dotfiles" ~/
+            ln -sf "${DOTFILES_HOME##$HOME/}/.dotfiles" ~/
          ;;
       esac
-      echo "Writing $DOTFILES_HOME_FILE with the following content:"
-      echo "export DOTFILES_HOME=\"$DOTFILES_HOME\"" | tee $DOTFILES_HOME_FILE
    fi
 
    dotstart_install
@@ -166,7 +158,7 @@ else
    echo "Removing dotfiles ..."
 fi
 
-if [ ! "$DOTFILES_HOME" ]
+if [ ! "${DOTFILES_HOME:-}" ]
 then
    echo "DOTFILES_HOME variable must be configured to use this script! Nothing to do!"
    exit 1
@@ -178,15 +170,6 @@ _dotfiles _$OP
 # pos-operations
 if [ "$OP" = "install" ]
 then 
-   if [ -f "$DOTSTART_FILE" ]
-   then
-      BACKUP="$DOTSTART_FILE".`date "+%Y%m%d-%H%M%S"`
-      echo "File \"$DOTSTART_FILE\" exists! Copying it to \"$BACKUP\"!"
-      cp -L "$DOTSTART_FILE" "$BACKUP"
-   else
-      echo "File \"$DOTSTART_FILE\" does not exists! Linking it to \"$DOTSTART_TEMPLATE_FILE\"!"
-   fi
-   ln -sf "$DOTSTART_TEMPLATE_FILE" "$DOTSTART_FILE"
    install_vim_plugins
    echo "Files installed! For effect, you need to restart your shell!"
    #case $OSTYPE in
@@ -196,5 +179,4 @@ else
    dotstart_uninstall
    echo "Files removed! For effect, you need to restart your shell!";
 fi
-
 # vim: set ts=3 sw=3 expandtab:

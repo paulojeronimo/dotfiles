@@ -101,23 +101,6 @@ carregar_arquivos_em() {
 # Show PATH, one per line
 showpath() { echo $PATH | tr : '\n'; }
 
-# Change the loaded environment configured at this file
-setenv() {
-  local env=$1
-  local DOTSTART_FILE=~/.ambiente
-
-  if ! [[ "$env" = /* ]]; then
-    env="$PWD/$env"
-  fi
-
-  if [ -f "$env" -o "$env" == /dev/null ]; then
-    sed -i "s,^\(export ENVIRONMENT=\)\(.*\),\1\"$env\",g" $DOTSTART_FILE
-    echo "Changes made at \"$DOTSTART_FILE\". For effect, reopen your shell."
-  else
-    echo "The file \"$env\" does'nt exists! Nothing was done."
-  fi
-}
-
 # Testa se o usuário que está executando esta função é root e falha, caso não seja
 verifica_root() {
   echo -n "Verificando se o usuário é root... "

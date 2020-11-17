@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Show more messages?
+VERBOSO=false
+
+# Use tmux?
+USE_TMUX=false
