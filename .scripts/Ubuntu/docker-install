@@ -1,26 +1,40 @@
 #!/usr/bin/env bash
+set -eou pipefail
 
 BASE_DIR=`cd "$(dirname "$0")"; pwd`
 source "$BASE_DIR/config"
 
-source_file "$proxy_file"
-source_file "$docker_file"
+sudo apt install -y docker.io
 
-# configure proxy
-docker_service_d=/etc/systemd/system/docker.service.d
-sudo mkdir -p $docker_service_d
-sudo cat > $docker_service_d/http-proxy.conf <<EOF
+proxy_config=true
+source_file "$proxy_file" || proxy_config=false
+
+docker_regsitry_config=true
+source_file "$docker_file" || docker_registry_config=false
+
+if $proxy_config
+then
+	echo "Configuring proxy settings for docker ..."
+	docker_service_d=/etc/systemd/system/docker.service.d
+	sudo mkdir -p $docker_service_d
+	sudo cat > $docker_service_d/http-proxy.conf <<EOF
 [Service]
 Environment="HTTP_PROXY=$http_proxy"
 Environment="NO_PROXY=localhost,127.0.0.0/8,$docker_registry_server"
 EOF
+fi
 
-# configure docker_registry
-docker_service=/etc/systemd/system/multi-user.targe.wants/docker.service
-cat > /dev/null << TO_BE_FIXED
+if $docker_registry_config
+then
+	echo "Configuring docker registry ..."
+	docker_service=/etc/systemd/system/multi-user.targe.wants/docker.service
+	cat > /dev/null << TO_BE_FIXED
 sudo sed 's/^(ExecStart.*)/\1 --insecure-registry $docker_registry/g' -i $docker_service
 TO_BE_FIXED
+fi
 
-# restart
 sudo systemctl daemon-reload
+
+sudo usermod -aG docker $UID
+sudo systemctl enable --now docker
 sudo systemctl restart docker
