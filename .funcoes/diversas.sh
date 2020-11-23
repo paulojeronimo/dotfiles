@@ -394,15 +394,22 @@ ruby_httpd() {
 
 my-ssh() {
   local ports
-  local forwards
-  if [[ "$1" =~ ^forwards= ]]; then
-    shift
-    ports=`cut -d= -f2 <<< "$1"`
-    for port in `tr ',' ' ' <<< "$ports"`; do
-      forwards+=('-L '$port:localhost:$port)
-    done
-  fi
-  ssh ${forwards[*]} $@
+  local ssh_params
+  while getopts ":f:" opt; do
+    case ${opt} in
+      f)
+        ports=`cut -d= -f2 <<< "$OPTARG"`
+        for port in `tr ',' ' ' <<< "$ports"`; do
+          ssh_params+=('-L '$port:localhost:$port)
+        done
+        ;;
+      :)
+        echo "Invalid option: -$OPTARG requires an argument!" 1>&2
+        ;;
+    esac
+  done
+  shift $((OPTIND -1))
+  ssh ${ssh_params[*]} $@
 }
 
 # vim: set tabstop=2 shiftwidth=2 expandtab:
