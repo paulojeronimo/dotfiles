@@ -392,4 +392,17 @@ ruby_httpd() {
   ruby -run -e httpd . -p 5000
 }
 
+my-ssh() {
+  local ports
+  local forwards
+  if [[ "$1" =~ ^forwards= ]]; then
+    shift
+    ports=`cut -d= -f2 <<< "$1"`
+    for port in `tr ',' ' ' <<< "$ports"`; do
+      forwards+=('-L '$port:localhost:$port)
+    done
+  fi
+  ssh ${forwards[*]} $@
+}
+
 # vim: set tabstop=2 shiftwidth=2 expandtab:
