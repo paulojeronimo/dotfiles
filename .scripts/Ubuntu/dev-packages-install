@@ -1,26 +1,21 @@
 #!/usr/bin/env bash
 
 apt_packages=(
-vim
-tree
-docker.io
-chromium-browser
-maven
-gradle
-nodejs
-npm
-asciidoctor
-lynx
-w3m
+	chromium-browser
+	curl
+	lynx
+	tree
+	vim
+	w3m
 )
 
 snap_packages=(
-"intellij-idea-community --classic"
-"kotlin --classic"
+	"intellij-idea-community --classic"
+	"kotlin --classic"
 )
 
 ruby_packages=(
-"asciidoctor-pdf --pre"
+	"asciidoctor-pdf --pre"
 )
 
 apt-packages-install() {
@@ -28,22 +23,23 @@ apt-packages-install() {
     sudo apt install -y ${apt_packages[*]}
 }
 
+cat > /dev/null << TO_BE_FIXED
 snap-packages-install() {
-    #cat > /dev/null << TO_BE_FIXED
     for snap_package in "${snap_packages[@]}"
     do
         snap install "$snap_package"
     done
-    #TO_BE_FIXED
 }
+TO_BE_FIXED
 
+cat > /dev/null << TO_BE_FIXED
 ruby-packages-install() {
-    #cat > /dev/null << TO_BE_FIXED
     for ruby_package in "${ruby_packages[@]}"
     do
         sudo gem install --http-proxy $http_proxy "$ruby_package"
     done
-    #TO_BE_FIXED
 }
+TO_BE_FIXED
 
-ruby-packages-install
+apt-packages-install
+#ruby-packages-install

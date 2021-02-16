@@ -1,0 +1,11 @@
+= Ubuntu scripts
+
+== Configuration
+
+	$ vim config
+
+== Installation
+
+	$ ./dev-packages-install
+	$ ./docker-install
+	$ ./docker-compose-install
