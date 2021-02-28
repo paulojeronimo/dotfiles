@@ -17,6 +17,7 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tpope/vim-fugitive'
 Plugin 'vmchale/dhall-vim'
 Plugin 'leafgarland/typescript-vim'
+Plugin 'mustache/vim-mustache-handlebars'
 call vundle#end()
 
 syntax enable
