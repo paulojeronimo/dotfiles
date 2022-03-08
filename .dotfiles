@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
-export DOTFILES_HOME=`cd ~/"$(dirname "$(readlink "${BASH_SOURCE[0]}")")"; pwd -P`
-f=~/.variables; source $f 2>&- || { source $f.default || return $?; }
+export DOTFILES_HOME=`cd "$(dirname "$(readlink "${BASH_SOURCE[0]}")")"; pwd -P`
+f=~/.variables; source $f 2>/dev/null || { source $f.default || return $?; }
 f=~/.funcoes/diversas.sh; source $f || return $?
 carregar_arquivos_em ~/.{configuracoes,funcoes}{,/$PLATAFORMA} -i $f
 unset f
 
 [[ $PLATAFORMA = Cygwin ]] && PATH=~/bin:$PATH
 PATH=~/.scripts:$PATH
+[[ $PLATAFORMA = Darwin ]] && PATH=~/.scripts/Darwin:$PATH
 PATH=~/.scripts/`boot-gists`:$PATH
 PATH=~/.scripts/docker:$PATH
 [[ $PLATAFORMA = Linux ]] && PATH=~/.scripts/`distro`:$PATH
@@ -23,3 +24,6 @@ export PATH
 }
 
 ! [ $PLATAFORMA = Linux ] || vm `vm-type`
+
+# TODO: verify if ZSHELL is the current user shell and if so, remove ~/.gitprompt
+# Ref: https://www.cyberciti.biz/tips/how-do-i-find-out-what-shell-im-using.html

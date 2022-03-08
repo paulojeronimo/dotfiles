@@ -19,7 +19,7 @@ case "$OSTYPE" in
   darwin*)
     PLATAFORMA=Darwin
     sed() { gsed "$@"; }
-    export -f sed
+    export -f sed &> /dev/null
     ;;
 esac
 export PLATAFORMA

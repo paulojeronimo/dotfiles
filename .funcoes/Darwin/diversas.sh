@@ -55,3 +55,8 @@ jdk() {
 	esac
 	export JAVA_HOME=$(/usr/libexec/java_home -v $1)
 }
+
+linux-intellij-idea() {
+	local linux=${linux:-p2mvu1}
+	$linux -X bash -c intellij-idea-community &> ~/.linux-intellij-idea.log &
+}

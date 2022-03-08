@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+cd
+rm .m2
+case "${1:-default}" in
+	default) ln -s .m2.default .m2;;
+	foton) ln -s foton/dotfiles/m2 .m2;;
+esac

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+server=${1:-pj0u.local}
+nc -z $server 22 2> /dev/null || {
+	echo "Server \$server\ is not available"
+	exit 1
+}
+keys=${keys:-$(echo id_rsa{,.pub})}
+if (cd; tar cf - .ssh/id_rsa{,.pub}) | ssh $server tar xf -
+then
+	echo "SSH Keys \"$keys\" copyied to \"$server\"!" 
+fi

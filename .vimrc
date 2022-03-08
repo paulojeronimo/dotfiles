@@ -18,6 +18,12 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'vmchale/dhall-vim'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'mustache/vim-mustache-handlebars'
+Plugin 'vito-c/jq.vim'
+Plugin 'udalov/kotlin-vim'
+Plugin 'aklt/plantuml-syntax'             " syntax hl for puml
+Plugin 'tyru/open-browser.vim'            " hooks for opeing browser
+Plugin 'weirongxu/plantuml-previewer.vim' " previewer
+Plugin 'cespare/vim-toml'
 call vundle#end()
 
 syntax enable
@@ -28,6 +34,7 @@ set shiftwidth=4
 set number
 set modelines=5
 set encoding=utf-8
+set hlsearch ignorecase
 colorscheme desert
 
 " http://bit.ly/37tB1Ne
@@ -42,3 +49,5 @@ if has('gui_running')
 else
   set listchars=eol:⏎,tab:>.,trail:.,extends:\#,nbsp:.
 endif
+
+set noswapfile

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+: << 'ASCIIDOC_COMMENT'
+* References:
+** https://discussions.apple.com/thread/2781638
+** https://www.peachpit.com/articles/article.aspx?p=1403238&seqNum=7
+** NOTE: the following is needed to work with Vim
+*** https://stackoverflow.com/questions/821902/disabling-swap-files-creation-in-vim
+ASCIIDOC_COMMENT
+
+set -eou pipefail
+
+if [ "$EUID" -ne 0 ]
+then
+	echo "Please run as root!"
+	exit 1
+fi
+
+[ "${1:-}" ] || { echo "A directory must be specified!"; exit 1; }
+dir=$1
+
+shift
+
+[ "${1:-}" ] || { echo "At least one user must be specified!"; exit 1; }
+users="$@"
+
+mkdir -p $dir
+chmod +a "group:staff allow list,add_file,search,add_subdirectory,readattr,writeattr,readextattr,writeextattr,readsecurity,file_inherit,directory_inherit" $dir
+chmod +ai "group:staff allow file_inherit" $dir
+chmod +ai "group:staff allow add_file,add_subdirectory" $dir
+
+for user in $users
+do
+	chmod +a "user:$user allow list,add_file,search,delete,add_subdirectory,delete_child,readattr,writeattr,readextattr,writeextattr,readsecurity,writesecurity,chown,file_inherit,directory_inherit" $dir
+done

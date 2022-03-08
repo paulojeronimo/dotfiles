@@ -34,6 +34,7 @@
 [alias]
   tagcommit = rev-list -n 1
   log-adog = log --all --decorate --oneline --graph
+	alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
 [commit]
 	template = ~/.stCommitMsg
 [pull]
