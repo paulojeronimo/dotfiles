@@ -24,4 +24,4 @@ echo "Syncing files ..."
 echo "  From: $PWD"
 echo "  To: $public_repo"
 # Ref1 Ref2
-rsync -av --exclude-from=$tmpfile --update --delete ./ "$public_repo"/
+rsync -av --exclude-from=$tmpfile --delete ./ "$public_repo"/
