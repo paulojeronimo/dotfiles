@@ -28,9 +28,9 @@ call vundle#end()
 
 syntax enable
 filetype plugin indent on
-"set expandtab
-set tabstop=4
-set shiftwidth=4
+set expandtab
+set tabstop=2
+set shiftwidth=2
 set number
 set modelines=5
 set encoding=utf-8
@@ -43,7 +43,8 @@ au BufRead,BufNewFile *.adoc setlocal textwidth=72 colorcolumn=72
 au BufRead,BufNewFile *.js setlocal textwidth=80 colorcolumn=80
 
 " https://vi.stackexchange.com/a/430
-set nolist
+set list
+set nowrap
 if has('gui_running')
   set listchars=eol:⏎,tab:▶\ ,trail:·,extends:\#,nbsp:.
 else
@@ -51,3 +52,4 @@ else
 endif
 
 set noswapfile
+set autoread

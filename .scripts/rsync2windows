@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -eou pipefail
+config=.rsync2windows
+
+if ! [ -f "$config" ]
+then
+  echo "File \"$config\" not found. Aborting!"
+  exit 1
+fi
+
+echo "Reading configurations in \"$config\" file ..."
+source "$PWD/$config"
+
+# https://stackoverflow.com/a/13864829
+if [ -z ${WINDOWS_DIR+x} ]
+then
+  echo "WINDOWS_DIR variable not configured. Aborting!"
+  exit 1
+fi
+
+echo "Copying files to \"$WINDOWS_DIR\" ..."
+rsync -av -delete --no-group --no-times --no-perms . "$WINDOWS_DIR"/
