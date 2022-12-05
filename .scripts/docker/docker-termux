@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -eou pipefail
+docker_log=$(mktemp)
+
+ok() {
+  echo ok
+}
+
+fail() {
+  echo fail!
+  cat $docker_log
+}
+
+f=.docker-termux; [ -f $f ] || {
+  echo File \"$f\" not found in this dir. Aborting!
+  exit 1
+}
+
+source "$PWD/$f"
+echo Container: $container_name
+
+case "${1:-run}" in
+  run|start)
+    docker start $container_name &> /dev/null || {
+      echo Creating container ...
+      docker run \
+        --mount type=bind,source="$PWD",target=/mnt/$container_name \
+        --detach \
+        --name $container_name \
+        --tty \
+        termux/termux-docker:x86_64
+    }
+    echo Acccessing container ...
+    docker exec --interactive --tty $container_name \
+      /data/data/com.termux/files/usr/bin/login
+    ;;
+  stop)
+    echo -n Stopping container "... "
+    docker stop $container_name &> $docker_log && ok || fail
+    ;;
+  rm|remove)
+    echo -n Removing container "... "
+    docker rm $container_name &> $docker_log && ok || fail
+    ;;
+  *)
+    cat <<'EOF'
+Usage:
+$0 <<run|start>|stop|<rm|remove>>
+EOF
+esac
+
