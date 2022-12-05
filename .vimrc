@@ -43,7 +43,7 @@ au BufRead,BufNewFile *.adoc setlocal textwidth=72 colorcolumn=72
 au BufRead,BufNewFile *.js setlocal textwidth=80 colorcolumn=80
 
 " https://vi.stackexchange.com/a/430
-set list
+"set list
 set nowrap
 if has('gui_running')
   set listchars=eol:⏎,tab:▶\ ,trail:·,extends:\#,nbsp:.
@@ -51,5 +51,7 @@ else
   set listchars=eol:⏎,tab:>.,trail:.,extends:\#,nbsp:.
 endif
 
+set belloff=all
 set noswapfile
 set autoread
+set noignorecase
