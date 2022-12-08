@@ -1,30 +1,35 @@
 #!/usr/bin/env bash
+#
+# Base for this script: https://github.com/termux/termux-docker/blob/master/run.sh
 set -eou pipefail
 docker_log=$(mktemp)
+default_container_name=${0##*/}
 
-ok() {
-  echo ok
-}
+ok() { echo ok; }
+fail() { echo fail!; cat $docker_log; }
 
-fail() {
-  echo fail!
-  cat $docker_log
-}
+f=.${0##*/}
+if ! [ -f $f ]
+then
+  container_name=${f#\.}
+else
+  source "$PWD/$f"
+fi
 
-f=.docker-termux; [ -f $f ] || {
-  echo File \"$f\" not found in this dir. Aborting!
-  exit 1
-}
-
-source "$PWD/$f"
 echo Container: $container_name
 
 case "${1:-run}" in
   run|start)
     docker start $container_name &> /dev/null || {
       echo Creating container ...
+      mount_source=$HOME
+      mount_target=home-$USER
+      [ "$container_name" = "$default_container_name" ] || {
+        mount_source=$PWD
+        mount_target=$container_name
+      }
       docker run \
-        --mount type=bind,source="$PWD",target=/mnt/$container_name \
+        --mount type=bind,source="$mount_source",target=/mnt/$mount_target \
         --detach \
         --name $container_name \
         --tty \
@@ -48,4 +53,3 @@ Usage:
 $0 <<run|start>|stop|<rm|remove>>
 EOF
 esac
-
