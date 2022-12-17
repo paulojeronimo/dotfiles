@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+device=${device:-/dev/video0}
+ffplay $device &> /dev/null &
