@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Author: Paulo Jerônimo (paulojeronimo.com)
+# Links:
+#   - Article | https://paulojeronimo.com/posts/cut-video
+#   - Video | https://youtube.com/@PauloJeronimo
+set -eou pipefail # ref-set
+cd "$(dirname "$0")" # ref-cd-to-the-script-location
+script_name=$(basename "$0" .sh)
+source ./.$script_name 2> /dev/null || { \
+  source ~/.$script_name 2> /dev/null || :; } # ref-source
+clips_file=${clips_file:-clips.csv} # ref-clips_file
+video_var=${video_var:-${PWD##*/}} # ref-video_var
+mkv_compression=${mkv_compression:-false}
+mkv_tool=${mkv_tool:-HandBrakeCLI} #ref-mkv_tool
+$mkv_compression && \
+  echo MKV compression will be made by $mkv_tool! || \
+  mkv_tool=
+go_ahead=true # ref-go_ahead
+for t in ffmpeg $mkv_tool
+do
+  command -v $t > /dev/null || { # ref-command-isnt-in-path
+    echo Command \"$t\" not found ...
+    go_ahead=false
+  }
+done
+for f in "$clips_file" original-video
+do
+  [ -f "$f" ] || { # ref-file-not-found
+    echo File \"$f\" not found ...
+    go_ahead=false
+  }
+done
+$go_ahead || { # ref-abort
+  echo Aborting due to the problems reported above!
+  exit 1
+}
+log=$script_name.log; > $log # ref-log
+while IFS=, read -r ss to video # ref-read-csv
+do
+  gen_file=$(sed "s,\$video,$video_var,g" <<< "$video") #ref-gen_file
+  echo ffmpeg -nostdin -y -i original-video \
+    -ss $ss -to $to -c:v copy \"$gen_file\" | tee last-cmd # ref-ffmpeg
+  sed 's/^/\$ /g' last-cmd >> $log; bash < last-cmd &>> $log
+  ! $mkv_compression || { # ref-mkv_compression
+    [ -f ./$mkv_tool.$$ ] || echo "#!/usr/bin/env bash" > $mkv_tool.$$
+    [ "$mkv_tool" = HandBrakeCLI ] && \
+      cmd="$mkv_tool -i \"$gen_file\" -o \"${gen_file%.*}.mkv\"" || \
+      cmd="$mkv_tool \"$gen_file\""
+    echo -e "tee last-cmd <<< '$cmd'\nsed 's/^/\$ /g' last-cmd >> \
+      $log\nbash < last-cmd &>> $log" >> $mkv_tool.$$
+  }
+done < "$clips_file"
+! $mkv_compression || {
+  mv -f ./$mkv_tool.$$ ./$mkv_tool; chmod +x ./$mkv_tool; ./$mkv_tool; }
+# vim: tabstop=2 shiftwidth=2 colorcolumn=72
