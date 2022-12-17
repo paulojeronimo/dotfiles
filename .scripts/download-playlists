@@ -18,5 +18,5 @@ do
   [[ $playlist =~ (^#|^$) ]] && continue
 
   #https://github.com/ytdl-org/youtube-dl#options
-  youtube-dl -co '%(playlist)s/%(playlist_index)s - %(title)s-%(id)s.%(ext)s' "$playlist"
+  yt-dlp -co '%(playlist)s/%(playlist_index)s - %(title)s-%(id)s.%(ext)s' "$playlist"
 done < "$PLAYLISTS"
