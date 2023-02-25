@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+usage() {
+  cat <<EOF
+Usage:
+$0 <github-repo> [--link-user] [--link-dir]
+EOF
+}
+github_repos=${github_repos:-~/Projects/github.com}
+link_user=false
+link_dir=false
+while [ "${1:-}" ]
+do
+  case "$1" in
+    --link-user) link_user=true;;
+    --link-dir) link_dir=true;;
+    *) repo=$1
+  esac
+  shift
+done
+[ "${repo:-}" ] || { usage; exit; }
+repo_dir=${repo##*/}
+repo_user=${repo#*//*/}
+repo_user=${repo_user%/*}
+
+echo Cloning $repo into "$github_repos"/$repo_user/$repo_dir ...
+mkdir -p "$github_repos"/$repo_user
+cd $_
+[ -d $repo_dir ] && \
+  echo Nothing to do '(already exists)!' || \
+  git clone $repo
+cd $OLDPWD
+if $link_user; then ln -sf "$github_repos"/$repo_user; fi
+if $link_dir; then ln -sf "$github_repos"/$repo_user/$repo_dir; fi
