@@ -273,12 +273,6 @@ path_canonical() {
   echo "$dst"
 }
 
-# Ajusta um prompt simples
-prompt_simples() { export OLD_PS1=$PS1; export PS1='\$ '; }
-
-# Retorna o prompt anterior, caso exista
-prompt_anterior() { [ "$OLD_PS1" ] && { export PS1=$OLD_PS1; unset OLD_PS1; }; }
-
 # Formata um arquivo XML preservando seus atritubos no sistema de arquivos
 xml_format() {
   local f="$1"
